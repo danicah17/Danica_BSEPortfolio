@@ -43,9 +43,7 @@ You should comment out all portions of your portfolio that you have not complete
 
 # First Milestone
 
-<!--- **Don't forget to replace the text below with the embedding for your milestone video. Go to Youtube, click Share -> Embed, and copy and paste the code to replace what's below.** -->
-
-<iframe width="560" height="315" src="https://www.youtube.com/embed/CaCazFBhYKs" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/6mwKerqYJog?si=9e9g_ttw-0v3EGIk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 ## Description
 For my first milestone, I figured out how to code and wire both the flex sensor and the accelerometer and make them detect when an angle is bad for my wrist. I coded both of them to tell me if I bended my wrist too far back or too far forward. How it works is that the flex sensor is a resistor, and the more it bends the more resistance it will apply. It sends data as analog data, so I had to attach it to a pin that would convert the data to understandable digital data. I then used a few equations to find out the range of resistances between when the sensor is straight and when it is bent to 90 degrees, and then used the map function to convert those resistances to the angle the sensor was bent at. I set the threshold to 30 degrees, which means if the flex sensor ever bends past 30 degrees the computer will print out a message to fix my wrist posturer. For the accelerometer, since it measures both rotation speed and acceleration in 3 axes and outputs 6 values, I used a Madgwick filter to help convert all of those values into the positions of the object along the roll, yaw, and pitch axes. I again set a threshold for those values which will also indicate if I need to fix my posture.
@@ -60,6 +58,236 @@ For my next steps, I will first add a piezo buzzer to my esp32 so that it will b
 ## Schematic
 
 ![Headstone Image](milestone 1 schematic.jpg)
+
+## Code
+
+```c++
+// Basic demo for accelerometer/gyro readings from Adafruit LSM6DS3TR-C
+const int flexPin = A6;
+const int fixedResistance = 10000;
+#include <MadgwickAHRS.h>
+#include <Adafruit_LSM6DS3TRC.h>
+
+// For SPI mode, we need a CS pin
+#define LSM_CS 10
+// For software-SPI mode we need SCK/MOSI/MISO pins
+#define LSM_SCK 13
+#define LSM_MISO 12
+#define LSM_MOSI 11
+
+Adafruit_LSM6DS3TRC lsm6ds3trc;
+Madgwick filter;
+
+void setup(void) {
+  Serial.begin(115200);
+  filter.begin(10);
+  while (!Serial)
+    delay(10); // will pause Zero, Leonardo, etc until serial console opens
+
+  Serial.println("Adafruit LSM6DS3TR-C test!");
+
+  if (!lsm6ds3trc.begin_I2C()) {
+    // if (!lsm6ds3trc.begin_SPI(LSM_CS)) {
+    // if (!lsm6ds3trc.begin_SPI(LSM_CS, LSM_SCK, LSM_MISO, LSM_MOSI)) {
+    Serial.println("Failed to find LSM6DS3TR-C chip");
+    while (1) {
+      delay(10);
+    }
+  }
+
+  Serial.println("LSM6DS3TR-C Found!");
+
+  // lsm6ds3trc.setAccelRange(LSM6DS_ACCEL_RANGE_2_G);
+  Serial.print("Accelerometer range set to: ");
+  switch (lsm6ds3trc.getAccelRange()) {
+  case LSM6DS_ACCEL_RANGE_2_G:
+    Serial.println("+-2G");
+    break;
+  case LSM6DS_ACCEL_RANGE_4_G:
+    Serial.println("+-4G");
+    break;
+  case LSM6DS_ACCEL_RANGE_8_G:
+    Serial.println("+-8G");
+    break;
+  case LSM6DS_ACCEL_RANGE_16_G:
+    Serial.println("+-16G");
+    break;
+  }
+
+  // lsm6ds3trc.setGyroRange(LSM6DS_GYRO_RANGE_250_DPS);
+  Serial.print("Gyro range set to: ");
+  switch (lsm6ds3trc.getGyroRange()) {
+  case LSM6DS_GYRO_RANGE_125_DPS:
+    Serial.println("125 degrees/s");
+    break;
+  case LSM6DS_GYRO_RANGE_250_DPS:
+    Serial.println("250 degrees/s");
+    break;
+  case LSM6DS_GYRO_RANGE_500_DPS:
+    Serial.println("500 degrees/s");
+    break;
+  case LSM6DS_GYRO_RANGE_1000_DPS:
+    Serial.println("1000 degrees/s");
+    break;
+  case LSM6DS_GYRO_RANGE_2000_DPS:
+    Serial.println("2000 degrees/s");
+    break;
+  case ISM330DHCX_GYRO_RANGE_4000_DPS:
+    break; // unsupported range for the DS33
+  }
+
+  // lsm6ds3trc.setAccelDataRate(LSM6DS_RATE_12_5_HZ);
+  Serial.print("Accelerometer data rate set to: ");
+  switch (lsm6ds3trc.getAccelDataRate()) {
+  case LSM6DS_RATE_SHUTDOWN:
+    Serial.println("0 Hz");
+    break;
+  case LSM6DS_RATE_12_5_HZ:
+    Serial.println("12.5 Hz");
+    break;
+  case LSM6DS_RATE_26_HZ:
+    Serial.println("26 Hz");
+    break;
+  case LSM6DS_RATE_52_HZ:
+    Serial.println("52 Hz");
+    break;
+  case LSM6DS_RATE_104_HZ:
+    Serial.println("104 Hz");
+    break;
+  case LSM6DS_RATE_208_HZ:
+    Serial.println("208 Hz");
+    break;
+  case LSM6DS_RATE_416_HZ:
+    Serial.println("416 Hz");
+    break;
+  case LSM6DS_RATE_833_HZ:
+    Serial.println("833 Hz");
+    break;
+  case LSM6DS_RATE_1_66K_HZ:
+    Serial.println("1.66 KHz");
+    break;
+  case LSM6DS_RATE_3_33K_HZ:
+    Serial.println("3.33 KHz");
+    break;
+  case LSM6DS_RATE_6_66K_HZ:
+    Serial.println("6.66 KHz");
+    break;
+  }
+
+  // lsm6ds3trc.setGyroDataRate(LSM6DS_RATE_12_5_HZ);
+  Serial.print("Gyro data rate set to: ");
+  switch (lsm6ds3trc.getGyroDataRate()) {
+  case LSM6DS_RATE_SHUTDOWN:
+    Serial.println("0 Hz");
+    break;
+  case LSM6DS_RATE_12_5_HZ:
+    Serial.println("12.5 Hz");
+    break;
+  case LSM6DS_RATE_26_HZ:
+    Serial.println("26 Hz");
+    break;
+  case LSM6DS_RATE_52_HZ:
+    Serial.println("52 Hz");
+    break;
+  case LSM6DS_RATE_104_HZ:
+    Serial.println("104 Hz");
+    break;
+  case LSM6DS_RATE_208_HZ:
+    Serial.println("208 Hz");
+    break;
+  case LSM6DS_RATE_416_HZ:
+    Serial.println("416 Hz");
+    break;
+  case LSM6DS_RATE_833_HZ:
+    Serial.println("833 Hz");
+    break;
+  case LSM6DS_RATE_1_66K_HZ:
+    Serial.println("1.66 KHz");
+    break;
+  case LSM6DS_RATE_3_33K_HZ:
+    Serial.println("3.33 KHz");
+    break;
+  case LSM6DS_RATE_6_66K_HZ:
+    Serial.println("6.66 KHz");
+    break;
+  }
+
+  lsm6ds3trc.configInt1(false, false, true); // accelerometer DRDY on INT1
+  lsm6ds3trc.configInt2(false, true, false); // gyro DRDY on INT2
+}
+
+void loop() {
+  // Get a new normalized sensor event
+  sensors_event_t accel;
+  sensors_event_t gyro;
+  sensors_event_t temp;
+  lsm6ds3trc.getEvent(&accel, &gyro, &temp);
+
+  // Serial.print("\t\tTemperature ");
+  // Serial.print(temp.temperature);
+  // Serial.println(" deg C");
+
+  // /* Display the results (acceleration is measured in m/s^2) */
+  // Serial.print("\t\tAccel X: ");
+  // Serial.print(accel.acceleration.x);
+  // Serial.print(" \tY: ");
+  // Serial.print(accel.acceleration.y);
+  // Serial.print(" \tZ: ");
+  // Serial.print(accel.acceleration.z);
+  // Serial.println(" m/s^2 ");
+
+  // /* Display the results (rotation is measured in rad/s) */
+  // Serial.print("\t\tGyro X: ");
+  // Serial.print(gyro.gyro.x);
+  // Serial.print(" \tY: ");
+  // Serial.print(gyro.gyro.y);
+  // Serial.print(" \tZ: ");
+  // Serial.print(gyro.gyro.z);
+  // Serial.println(" radians/s ");
+  // Serial.println();
+
+  int flexValue;
+  flexValue = analogRead(flexPin);
+  float voltage = flexValue * (3.3/4095.0);
+  float flexResistance = fixedResistance * (3.3/voltage - 1.0);
+  //Serial.println(flexResistance);
+  float angle = map(flexResistance, 12000, 28000, 0.0, 90.0);
+  Serial.print("angle: ");
+  Serial.println(String(angle) + " degrees");
+  
+
+  filter.updateIMU(gyro.gyro.x, gyro.gyro.y, gyro.gyro.z, accel.acceleration.x, accel.acceleration.y, accel.acceleration.z);
+  Serial.print("Filter angles: ");
+  Serial.print(filter.getRoll());
+  Serial.print(" ");
+  Serial.print(filter.getYaw());
+  Serial.print(" ");
+  Serial.println(filter.getPitch());
+  
+  if (filter.getPitch() < -35 || filter.getPitch() > 30 || angle > 30 || angle < -5) {
+    Serial.println("fix posture");
+  }
+
+
+  delay(100);
+
+  //  // serial plotter friendly format
+
+  //  Serial.print(temp.temperature);
+  //  Serial.print(",");
+
+  //  Serial.print(accel.acceleration.x);
+  //  Serial.print(","); Serial.print(accel.acceleration.y);
+  //  Serial.print(","); Serial.print(accel.acceleration.z);
+  //  Serial.print(",");
+
+  // Serial.print(gyro.gyro.x);
+  // Serial.print(","); Serial.print(gyro.gyro.y);
+  // Serial.print(","); Serial.print(gyro.gyro.z);
+  // Serial.println();
+  //  delayMicroseconds(10000);
+}
+```
 
 # Starter Project
 
