@@ -47,11 +47,19 @@ You should comment out all portions of your portfolio that you have not complete
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/CaCazFBhYKs" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 
-<!--- For your first milestone, describe what your project is and how you plan to build it. You can include:
-- An explanation about the different components of your project and how they will all integrate together
-- Technical progress you've made so far
-- Challenges you're facing and solving in your future milestones
-- What your plan is to complete your project -->
+## Description
+For my first milestone, I figured out how to code and wire both the flex sensor and the accelerometer and make them detect when an angle is bad for my wrist. I coded both of them to tell me if I bended my wrist too far back or too far forward. How it works is that the flex sensor is a resistor, and the more it bends the more resistance it will apply. It sends data as analog data, so I had to attach it to a pin that would convert the data to understandable digital data. I then used a few equations to find out the range of resistances between when the sensor is straight and when it is bent to 90 degrees, and then used the map function to convert those resistances to the angle the sensor was bent at. I set the threshold to 30 degrees, which means if the flex sensor ever bends past 30 degrees the computer will print out a message to fix my wrist posturer. For the accelerometer, since it measures both rotation speed and acceleration in 3 axes and outputs 6 values, I used a Madgwick filter to help convert all of those values into the positions of the object along the roll, yaw, and pitch axes. I again set a threshold for those values which will also indicate if I need to fix my posture.
+
+## Challenges
+One of the challenges was I had was adjusting the conversion equations. The ones I found online were for the Arduino Uno board, and since I'm using the ESP32 board, the equations were giving me the wrong values. I had to adjust the voltage and the digital value range. But after I adjusted the values, another problem happened. As I bent the flex sensor, the output values would get smaller instead of larger. After analyzing the equations, I concluded I needed to switch the positions of my resistor and my flex sensor, as the way I had originally placed them to send incorrect values to the equation. Another challenge was that the accelerometer was giving me 6 values at a time and I didn't know which of the 6 to use. I realized that Arduino has a library called Madgwick that actually filters those 6 values and gives you the position of the accelerometer along the roll, yaw, and pitch axes. I ended up using that filter and using the values it gave me to set a threshold.
+
+## Next Steps
+
+For my next steps, I will first add a piezo buzzer to my esp32 so that it will buzz whenever my wrist is too bent. I will also try and incorporate Bluetooth into my project so that the device can wirelessly transmit data to the computer.
+
+## Schematic
+
+![Headstone Image](milestone 1 schematic.jpg)
 
 # Starter Project
 
