@@ -51,13 +51,17 @@ For my first milestone, I figured out how to code and wire both the flex sensor 
 ### Flex Sensor
 The flex sensor is a resistor, and the more it bends the more resistance it will apply. I coded it so that the bend corresponds to the angle of the wrist, so the more it bends, the more the angle increases. It doesn't originally send data as angles though, it sends data as analog data (information sensors send represented by a range of values). I had to attach it to a pin that would convert the data to understandable digital data (values that actually follow Arduino's documentation). This process is basically ADC conversioon. But, since I wanted the data to be in degrees, I then had to use a few equations to convert the digital data in degrees. 
 
+[Headstone Image](flex sensor.png)
+
 ### Converting Digital Data to Angles
 The first equation I used was (flexValue * (3.3/4095.0)). FlexValue is the digital data that the Arduino outputs, 3.3 is the max analog value (aka voltage) the ESP32 is able to output, and 4095.0 is the corresponding max digital value. This equation helps convert the digital data to voltage. The next equation I used was (10000 * (3.3/voltage - 1.0)). The 10000 is the resistance of the flex sensor when it is straight, the 3.3 is again the max value of voltage the ESP32 can output, and the voltage is the voltage found from the previous equation. The equation is used to convert the voltage to the amount of resistance the flex sensor is applying. After I used those 2 equations to find the resistance, I used a function called map() that actually helps convert those resistance values into angles. The map() function takes in a few parameters so it can set a threshold as to know what resistance value counts as 0 degrees and what counts as 90 degrees. I set the optimal wrist degree to 30 degrees, which means if the flex sensor ever bends past 30 degrees the computer will print out a message warning me to fix my wrist posture. 
+
+![Headstone Image](equations.jpg)
 
 ### Accelerometer and Madgwick Filter
 For the accelerometer, since it measures both values of a gyroscope (rotation speed) and an accelerometer (acceleration) along the x, y, and z axes, it outputs 6 values at a time. I ended up using a Madgwick filter to help convert all of those values into the orientationos of the object along the roll, yaw, and pitch axes. The roll, pitch, and yaw axes are the main axes that planes use in the air. I again set a threshold for the pitch axis, since the pitch axis is what the wrist technically rotatese around. That threshold will also indicate if I need to fix my posture.
 
-![Headstone Image] 
+![Headstone Image](axis.png) 
 
 ## Challenges
 One of the challenges was I had was adjusting the conversion equations. The ones I found online were for the Arduino Uno board, and since I'm using the ESP32 board, the equations were giving me the wrong values. The voltage was 5 instead of 3.3, and the corresponding digital was 1023.0 instead of 4095.0. I had to adjust those values according to the ranges of the ESP32. But after I adjusted the values, another problem happened. As I bent the flex sensor, the output values would get smaller instead of larger. After analyzing the equations, I concluded I needed to switch the positions of my resistor and my flex sensor, as the way I had originally placed them to send incorrect values to the equation. Another challenge was that the accelerometer was giving me 6 values at a time and I didn't know which of the 6 to use. I realized that Arduino has a library called Madgwick that actually filters those 6 values and gives you the position of the accelerometer along the roll, yaw, and pitch axes. I ended up using that filter and using the values it gave me to set a threshold.
