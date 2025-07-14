@@ -81,7 +81,7 @@ Figure of equations that I used
 ### Accelerometer and Madgwick Filter
 For the accelerometer, since it measures both values of a gyroscope (rotation speed) and an accelerometer (acceleration) along the x, y, and z axes, it outputs 6 values at a time. I ended up using a Madgwick filter to help convert all of those values into the orientationos of the object along the roll, yaw, and pitch axes. The roll, pitch, and yaw axes are the main axes that planes use in the air. I again set a threshold for the pitch axis, since the pitch axis is what the wrist technically rotates around. That threshold will also indicate if I need to fix my posture.
 
-![Headstone Image](equations.jpg)
+![Headstone Image](rollpitchyaw.jpg)
 Figure of roll, pitch, and yaw axes
 
 ## Challenges
