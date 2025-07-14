@@ -48,7 +48,7 @@ Figure of the flow chart of my wrist turn code
 ### Bluetooth
 Since the ESP32 already has a built in Bluetooth module, I didn't have to use the HC05. Implementing the Bluetooth module was not too complicated. I first downloaded the BleSerial library on Arduino and created a BleSerial object in my code. The BleSerial object is the serial on my phone, and creating it allows me to actually run code that uses it. I then downloaded the BLESerialnRF52 app on my phone, since downloading an app is the only way to open a serial on a phone. I then figured out how to communicate between the two serials using code. It mainly consisted of using the available() function to check if there was data to be read, then using the read() function to read the data. Then with that data I could do whatever I wanted. I realized I could use this communication to write commands on my phone. I tweaked the code so that the device would do things based on the commands I typed on my phone serial. For example, if I typed "start monitoring" on my phone, the device would start monitoring the angle of the flex sensor and allowing the buzzer to beep. Or, if I wanted to do a certain amount of wrist turns, I could type in "do wrist turns" on my serial and also type in how many I want to do.
 
-[Headstone Image](bleandesp.jpg)
+![Headstone Image](bleandesp.jpg)
 Figure of the BLESerialnRF52 app and ESP32
 
 ## Challenges
@@ -56,7 +56,7 @@ One of my challenges was that for some reason, when I was first testing my accel
 
 ## Schematic
 
-[Headstone Image](milestone2schematic.jpg)
+![Headstone Image](milestone2schematic.jpg)
 Schematic for flex sensor, accelerometer, and piezo buzzer
 
 # First Milestone
@@ -69,7 +69,7 @@ For my first milestone, I figured out how to code and wire both the flex sensor 
 ### Flex Sensor
 The flex sensor is a resistor, and the more it bends the more resistance it will apply. I coded it so that the bend corresponds to the angle of the wrist, so the more it bends, the more the angle increases. It doesn't originally send data as angles though, it sends data as analog data (information sensors send represented by a range of values). I had to attach it to a pin that would convert the data to understandable digital data (values that actually follow Arduino's documentation). This process is basically ADC conversioon. But, since I wanted the data to be in degrees, I then had to use a few equations to convert the digital data in degrees. 
 
-[Headstone Image](flex sensor.png)
+![Headstone Image](flex sensor.png)
 Figure of a flex sensor
 
 ### Converting Digital Data to Angles
