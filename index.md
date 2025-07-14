@@ -42,7 +42,7 @@ The piezo buzzer is an output device, so I tell it what to do in my code. I can 
 ### How to Monitor Wrist Turns
 For the accelerometer, I really didn't change much. I still used the Madgwick filter to convert the values of the gyroscope and the accelerometer into orientations along the roll, pitch, and yaw axes. The only difference was how I used the values along the pitch axes. The code I had to write had a lot of checks and I had to make many global variables. For starters, I needed to make sure that the code block for wrist turns would only run when I commanded it to. I made a boolean called exercise and made it so the code block would only run if exercise was set to true. Next, I made a boolean called calibrated. To make it true, I have to make sure my wrist is straight and the pitch values were between 2 and -2 for at least 3 seconds. Once the device is calibrated, I can start doing my wrist turns. For my wrist turns, I made an another boolean called waiting4Raise. Once my wrist is pointed downwards and has a pitch value that is bigger than 42, waiting4Raise becomes true and a timer starts. waiting4Raise basically means that the device is waiting for me to move my wrist upward, since I already moved it down. If within 2 seconds my wrist is pointed up and the pitch value is less than -56, the rep count increases since that counts as a complete wrist turn. After one wrist turn, waiting4Raise is set back to false. If I have completed all of my wrist turns, exercise is set to false, calibrated is also set to false, and the rep count is set back to 0.
 
-[Headstone Image](Programming flowchart example.png)
+![Headstone Image](Programming flowchart example.png)
 Figure of the flow chart of my wrist turn code
 
 ### Bluetooth
