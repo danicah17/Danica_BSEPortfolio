@@ -24,6 +24,7 @@ Figure #1: The sensor velcroed on the wrist sleeve and the accelerometer also se
 The main challenges I had were after I soldered the flex sensor. For some reason, when I tested it, my angle values started to jump a lot, sometimes randomly shooting to really high values and sometimes decreasing to -67 degrees. When I debugged it, I noticed the flex value was going up to 4095.0, which is the maximum digital value the flex sensor can output. That meant there was a short somewhere, which means that power is connecting to ground. After looking at my soldering, I realized one of the copper strands of the jumper wire was touching one of the metal pins on the back of the flex sensor which was causing the flex sensor to bug out. After I removed the strand, the flex sensor stopped fluctuating like crazy. But, the angles were still wrong. For example, when my wrist was straight, the angle outputed was about 20 degrees. I concluded that the threshold for the map() function needed to be changed, because maybe the velcro caused the sensor to bend weirdly. As shown in the figure below, the circled parameters are the threshold, with 15000 corresponding to 0 degrees and 45000 resistance corresponding to 90 degrees. After I tweaked the parameters for the map() function, everything started working normally.
 
 ![Headstone Image](mapfunction.jpg)
+
 Figure #2: The map function that converts resistance to angle
 
 ## Schematic
