@@ -33,14 +33,12 @@ Figure #2: The map function that converts resistance to angle
 ![Headstone Image](milestone3schematic.jpg)
 Figure #3: Schematic of flex sensor, accelerometer, piezo buzzer with resistor
 
-
-
 # Second Milestone
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/SlVOGyVt5ZI?si=1MQGcsITQpj9sgie" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 ## Description
-For my second milestone, I actually changed the function of my accelerometer. Since my flex sensor already functions to monitor the angle of my wrist, I coded it to help monitor the number of wrist turns you do. I also added a piezo buzzer onto my board so it can beep for different purposes. Finally, I incoporated the Bluetooth module that's built on the ESP32 so I can wirelessly transmit information from my phone to the computer and the Arduino. Using the Bluetooth, I added commands that I can type out on my phone to tell the device to do something.
+For my second milestone, I actually changed the function of my accelerometer. Since my flex sensor already functions to monitor the angle of my wrist, I coded it to help monitor the number of wrist turns you do. I also added a piezo buzzer onto my board so it can beep for different purposes. Finally, I incoporated the Bluetooth module that's built on the ESP32 so I can wirelessly transmit information from my phone to the computer and the Arduino. Using the Bluetooth, I added commands that I can type out on my phone to tell the device to do something. (Refer to the milestone 2 code or milestone 3 in the code appendix to see how I coded the commands)
 
 <img src="commands.jpg" width="300"/>
 
@@ -50,13 +48,13 @@ Figure #4: The commands I can type on my phone
 The piezo buzzer is an output device, so I tell it what to do in my code. I can control when it beeps, the frequency at which it beeps at, and how long it beeps for. Since I want the buzzer to beep for 3 different purposes, I set a different frequency each time so the user wouldn't be confused on what it's beeping about. For example, if the flex sensor bends past 30 degrees (the threshold I set), it will keep beeping at 1000 Hz until the flex sensor's angle is below 30. On the other hand, if I'm doing wrist turns, the piezo buzzer will beep at 3000 Hz for 500 milliseconds every time I complete a wrist turn.
 
 ### How to Monitor Wrist Turns
-For the accelerometer, I really didn't change much. I still used the Madgwick filter to convert the values of the gyroscope and the accelerometer into orientations along the roll, pitch, and yaw axes. The only difference was how I used the values along the pitch axes. The code I had to write had a lot of checks and I had to make many global variables. For starters, I needed to make sure that the code block for wrist turns would only run when I commanded it to. I made a boolean called exercise and made it so the code block would only run if exercise was set to true. Next, I made a boolean called calibrated. To make it true, I have to make sure my wrist is straight and the pitch values were between 2 and -2 for at least 3 seconds. Once the device is calibrated, I can start doing my wrist turns. For my wrist turns, I made an another boolean called waiting4Raise. Once my wrist is pointed downwards and has a pitch value that is bigger than 42, waiting4Raise becomes true and a timer starts. waiting4Raise basically means that the device is waiting for me to move my wrist upward, since I already moved it down. If within 2 seconds my wrist is pointed up and the pitch value is less than -56, the rep count increases since that counts as a complete wrist turn. After one wrist turn, waiting4Raise is set back to false. If I have completed all of my wrist turns, exercise is set to false, calibrated is also set to false, and the rep count is set back to 0.
+For the accelerometer, I really didn't change much. I still used the Madgwick filter to convert the values of the gyroscope and the accelerometer into orientations along the roll, pitch, and yaw axes. The only difference was how I used the values along the pitch axes. The code I had to write had a lot of checks and I had to make many global variables. For starters, I needed to make sure that the code block for wrist turns would only run when I commanded it to. I made a boolean called exercise and made it so the code block would only run if exercise was set to true. Next, I made a boolean called calibrated. To make it true, I have to make sure my wrist is straight and the pitch values were between 2 and -2 for at least 3 seconds. Once the device is calibrated, I can start doing my wrist turns. For my wrist turns, I made an another boolean called waiting4Raise. Once my wrist is pointed downwards and has a pitch value that is bigger than 42, waiting4Raise becomes true and a timer starts. waiting4Raise basically means that the device is waiting for me to move my wrist upward, since I already moved it down. If within 2 seconds my wrist is pointed up and the pitch value is less than -56, the rep count increases since that counts as a complete wrist turn. After one wrist turn, waiting4Raise is set back to false. If I have completed all of my wrist turns, exercise is set to false, calibrated is also set to false, and the rep count is set back to 0. (Refer to the second or third milestone code in the code appendix to see how I coded the wrist turns)
 
 ![Headstone Image](Programming flowchart example.jpeg)
 Figure #5: The flow chart of my wrist turn code
 
 ### Bluetooth
-Since the ESP32 already has a built in Bluetooth module, I didn't have to use the HC05. Implementing the Bluetooth module was not too complicated. I first downloaded the BleSerial library on Arduino and created a BleSerial object in my code. The BleSerial object is the serial on my phone, and creating it allows me to actually run code that uses it. I then downloaded the BLESerialnRF52 app on my phone, since downloading an app is the only way to open a serial on a phone. I then figured out how to communicate between the two serials using code. It mainly consisted of using the available() function to check if there was data to be read, then using the read() function to read the data. Then with that data I could do whatever I wanted. I realized I could use this communication to write commands on my phone. I tweaked the code so that the device would do things based on the commands I typed on my phone serial. For example, if I typed "start monitoring" on my phone, the device would start monitoring the angle of the flex sensor and allowing the buzzer to beep. Or, if I wanted to do a certain amount of wrist turns, I could type in "do wrist turns" on my serial and also type in how many I want to do. (Refer to the milestone 2 code in the code appendix to see how I coded the bluetooth serial)
+Since the ESP32 already has a built in Bluetooth module, I didn't have to use the HC05. Implementing the Bluetooth module was not too complicated. I first downloaded the BleSerial library on Arduino and created a BleSerial object in my code. The BleSerial object is the serial on my phone, and creating it allows me to actually run code that uses it. I then downloaded the BLESerialnRF52 app on my phone, since downloading an app is the only way to open a serial on a phone. I then figured out how to communicate between the two serials using code. It mainly consisted of using the available() function to check if there was data to be read, then using the read() function to read the data. Then with that data I could do whatever I wanted. I realized I could use this communication to write commands on my phone. I tweaked the code so that the device would do things based on the commands I typed on my phone serial. For example, if I typed "start monitoring" on my phone, the device would start monitoring the angle of the flex sensor and allowing the buzzer to beep. Or, if I wanted to do a certain amount of wrist turns, I could type in "do wrist turns" on my serial and also type in how many I want to do. (Refer to the milestone 2 or milestone 2 code in the code appendix to see how I coded the bluetooth serial)
 
 ![Headstone Image](bleandesp.jpg)
 Figure #6: The BLESerialnRF52 app and ESP32
@@ -107,15 +105,29 @@ For my next steps, I will first add a piezo buzzer to my ESP32 so that it will b
 ![Headstone Image](milestone 1 schematic.jpg)
 Figure #11: Schematic for flex sensor and accelerometer
 
-## Code
+# Code
 
-Code for first milestone
+## Third Milestone
 ```c++
 // Basic demo for accelerometer/gyro readings from Adafruit LSM6DS3TR-C
 const int flexPin = A6;
 const int fixedResistance = 10000;
+const int buzzer = 18;
+unsigned long currentTime = millis();
+unsigned long repStart = 0.0;
+int repCount = 0;
+int wristTurns = 1;
+int countSeconds = 0;
+bool waiting4Raise = false;
+bool calibrated = false;
+bool monitor = false;
+bool exercise = false;
 #include <MadgwickAHRS.h>
 #include <Adafruit_LSM6DS3TRC.h>
+#include <BleSerial.h>
+
+
+
 
 // For SPI mode, we need a CS pin
 #define LSM_CS 10
@@ -126,10 +138,15 @@ const int fixedResistance = 10000;
 
 Adafruit_LSM6DS3TRC lsm6ds3trc;
 Madgwick filter;
+BleSerial ble;
 
-void setup(void) {
+const float sampleFreq = 20.0;
+
+
+void setup() {
   Serial.begin(115200);
-  filter.begin(10);
+  filter.begin(sampleFreq);
+  ble.begin("danica's serial");
   while (!Serial)
     delay(10); // will pause Zero, Leonardo, etc until serial console opens
 
@@ -185,7 +202,7 @@ void setup(void) {
     break; // unsupported range for the DS33
   }
 
-  // lsm6ds3trc.setAccelDataRate(LSM6DS_RATE_12_5_HZ);
+  //lsm6ds3trc.setAccelDataRate(LSM6DS_RATE_20_HZ);
   Serial.print("Accelerometer data rate set to: ");
   switch (lsm6ds3trc.getAccelDataRate()) {
   case LSM6DS_RATE_SHUTDOWN:
@@ -263,6 +280,7 @@ void setup(void) {
 
   lsm6ds3trc.configInt1(false, false, true); // accelerometer DRDY on INT1
   lsm6ds3trc.configInt2(false, true, false); // gyro DRDY on INT2
+  pinMode(buzzer, OUTPUT);
 }
 
 void loop() {
@@ -276,7 +294,7 @@ void loop() {
   // Serial.print(temp.temperature);
   // Serial.println(" deg C");
 
-  // /* Display the results (acceleration is measured in m/s^2) */
+  /* Display the results (acceleration is measured in m/s^2) */
   // Serial.print("\t\tAccel X: ");
   // Serial.print(accel.acceleration.x);
   // Serial.print(" \tY: ");
@@ -285,7 +303,7 @@ void loop() {
   // Serial.print(accel.acceleration.z);
   // Serial.println(" m/s^2 ");
 
-  // /* Display the results (rotation is measured in rad/s) */
+  /* Display the results (rotation is measured in rad/s) */
   // Serial.print("\t\tGyro X: ");
   // Serial.print(gyro.gyro.x);
   // Serial.print(" \tY: ");
@@ -294,31 +312,130 @@ void loop() {
   // Serial.print(gyro.gyro.z);
   // Serial.println(" radians/s ");
   // Serial.println();
+  
+  if (ble.available()) {                                                  // if there is data to be read from the phone serial
+    String message = ble.readStringUntil('\n');                           // reads the message until there is a new line
+    message.toLowerCase();
+    if (message == "start monitoring") {
+      monitor = true;                                                     // boolean for flex sensor
+      ble.println("started");
+    }
+    else if (message == "stop monitoring") {
+      monitor = false;
+      ble.println("stopped");
+    }
+    else if (message == "do wrist turns") {
+      ble.println("how many?");
+      while (!ble.available()) { 
+        delay(100);                                                       // delay until there is data to be read from the phone (otherwise the code runs so fast it will skip over the phone input)
+        Serial.print(".");
+      }
+      String str = ble.readStringUntil('\n');
+      ble.println(str);
+      wristTurns = str.toInt();
+      Serial.println(wristTurns);
+      exercise = true;
+    }
+    else if (message == "menu") {
+      ble.println("1. 'start monitoring' - allows the device to monitor the angle of your wrist and beep if the angle is too steep");
+      ble.println("2. 'stop monitoring' - the device will stop monitoring the angle of your wrist, mainly used when sleeping");
+      ble.println("3. 'do wrist turns' - you will be prompted to enter the amount of wrist turns you do and it will monitor how many you do");
+    }
+  }
 
-  int flexValue;
-  flexValue = analogRead(flexPin);
-  float voltage = flexValue * (3.3/4095.0);
-  float flexResistance = fixedResistance * (3.3/voltage - 1.0);
-  //Serial.println(flexResistance);
-  float angle = map(flexResistance, 12000, 28000, 0.0, 90.0);
-  Serial.print("angle: ");
-  Serial.println(String(angle) + " degrees");
+  if (monitor) {                                                          // will start monitoring the angle of the wrist if monitor is true, will not if it's false
+    int flexValue;
+    flexValue = analogRead(flexPin);                                      // converts the analog voltage to readable digital data
+    float voltage = flexValue * (3.3/4095.0);                             // converts the digital data to voltage
+    float flexResistance = fixedResistance * (3.3/voltage - 1.0);         // converts voltage to resistance
+    Serial.println(String(flexResistance) + " resistance");
+    float angle = map(flexResistance, 15000, 45000, 0.0, 90.0);           // converts resistance to angle it's bent at
+    Serial.println("flexValue: "+ String(flexValue));
+    Serial.print("angle: ");
+    Serial.println(String(angle) + " degrees");
+    if (angle >= 21) {
+      ble.println("Tilt wrist up");
+      tone(buzzer, 5000);                                                 // piezo buzzer buzzes
+    }
+    else if(angle <= -7) {
+      ble.println("Tilt wrist down");
+      tone(buzzer, 5000);
+    }
+    else {
+      noTone(buzzer);
+    }
+  }
+  
+  else {
+    noTone(buzzer);
+  }
   
 
-  filter.updateIMU(gyro.gyro.x, gyro.gyro.y, gyro.gyro.z, accel.acceleration.x, accel.acceleration.y, accel.acceleration.z);
-  Serial.print("Filter angles: ");
-  Serial.print(filter.getRoll());
-  Serial.print(" ");
-  Serial.print(filter.getYaw());
-  Serial.print(" ");
-  Serial.println(filter.getPitch());
-  
-  if (filter.getPitch() < -35 || filter.getPitch() > 30 || angle > 30 || angle < -5) {
-    Serial.println("fix posture");
+  filter.updateIMU((gyro.gyro.x * 180)/PI, 
+  (gyro.gyro.y * 180)/PI, (gyro.gyro.z * 180)/PI, 
+  accel.acceleration.x, accel.acceleration.y, accel.acceleration.z);      // Madgwick filter updates its values
+
+  if (repCount < wristTurns && exercise) {                                // will run if the use wants to do wrist turns
+    if (!calibrated) {                                                    // calibrating
+      if (filter.getPitch() <= 2 && filter.getPitch() >= -2) {
+        Serial.print("Filter angles: ");
+        Serial.print(filter.getRoll());
+        Serial.print(" ");
+        Serial.print(filter.getYaw());
+        Serial.print(" ");
+        Serial.println(filter.getPitch());
+        ble.println("Calibrating.....");
+        countSeconds++;
+        if (countSeconds == 60) {                                         // if the pitch value of wrist is between 2 and -2 for 3 seconds
+          calibrated = true;
+          ble.println("Calibrated! You can begin");
+          countSeconds = 0;
+        }
+      }
+      else {
+        Serial.print("Filter angles: ");
+        Serial.print(filter.getRoll());
+        Serial.print(" ");
+        Serial.print(filter.getYaw());
+        Serial.print(" ");
+        Serial.println(filter.getPitch());
+        ble.println("Straighten out your wrist");
+        countSeconds = 0;
+      }
+    }
+    
+    if (calibrated) { 
+      if (filter.getPitch() >= 42) {                                      // if wrist is pointed down and the pitch value exceeds 42
+        waiting4Raise = true;                                             // boolean for waiting for the wrist to go up
+        repStart = currentTime;                                           // the starting time of the rep
+      }
+
+      if (waiting4Raise && currentTime - repStart <= 2000) {              // if waiting4Raise is true and the time between the current time and the start time is less than 2 seconds
+        if (filter.getPitch() <= -56) {                                   // if the wrist is pointed up and the pitch value is less than -56
+          repCount += 1;
+          tone(buzzer, 3000, 500);                                        // buzz
+          ble.println(repCount);
+          waiting4Raise = false;
+        }
+      }
+    }
+
+    if (repCount == wristTurns) {                                         // the goal has been reached
+      ble.println("Congrats! You're done!");
+      repCount = 0;
+      exercise = false;
+      calibrated = false;
+      tone(buzzer, 4000, 500);                                            // buzzer indicating that process is done
+      delay(1000);
+      tone(buzzer, 4000, 500);
+      delay(1000);
+      tone(buzzer, 4000, 500);
+    }
   }
 
 
-  delay(100);
+
+  delay(50);
 
   //  // serial plotter friendly format
 
@@ -337,7 +454,8 @@ void loop() {
   //  delayMicroseconds(10000);
 }
 ```
-Code for second milestone
+
+## Second Milestone
 ```c++
 // Basic demo for accelerometer/gyro readings from Adafruit LSM6DS3TR-C
 const int flexPin = A6;
@@ -690,27 +808,14 @@ void loop() {
   //  delayMicroseconds(10000);
 }
 ```
-Code for milestone 3
+
+## Third Milestone
 ```c++
 // Basic demo for accelerometer/gyro readings from Adafruit LSM6DS3TR-C
 const int flexPin = A6;
 const int fixedResistance = 10000;
-const int buzzer = 18;
-unsigned long currentTime = millis();
-unsigned long repStart = 0.0;
-int repCount = 0;
-int wristTurns = 1;
-int countSeconds = 0;
-bool waiting4Raise = false;
-bool calibrated = false;
-bool monitor = false;
-bool exercise = false;
 #include <MadgwickAHRS.h>
 #include <Adafruit_LSM6DS3TRC.h>
-#include <BleSerial.h>
-
-
-
 
 // For SPI mode, we need a CS pin
 #define LSM_CS 10
@@ -721,15 +826,10 @@ bool exercise = false;
 
 Adafruit_LSM6DS3TRC lsm6ds3trc;
 Madgwick filter;
-BleSerial ble;
 
-const float sampleFreq = 20.0;
-
-
-void setup() {
+void setup(void) {
   Serial.begin(115200);
-  filter.begin(sampleFreq);
-  ble.begin("danica's serial");
+  filter.begin(10);
   while (!Serial)
     delay(10); // will pause Zero, Leonardo, etc until serial console opens
 
@@ -785,7 +885,7 @@ void setup() {
     break; // unsupported range for the DS33
   }
 
-  //lsm6ds3trc.setAccelDataRate(LSM6DS_RATE_20_HZ);
+  // lsm6ds3trc.setAccelDataRate(LSM6DS_RATE_12_5_HZ);
   Serial.print("Accelerometer data rate set to: ");
   switch (lsm6ds3trc.getAccelDataRate()) {
   case LSM6DS_RATE_SHUTDOWN:
@@ -863,7 +963,6 @@ void setup() {
 
   lsm6ds3trc.configInt1(false, false, true); // accelerometer DRDY on INT1
   lsm6ds3trc.configInt2(false, true, false); // gyro DRDY on INT2
-  pinMode(buzzer, OUTPUT);
 }
 
 void loop() {
@@ -877,7 +976,7 @@ void loop() {
   // Serial.print(temp.temperature);
   // Serial.println(" deg C");
 
-  /* Display the results (acceleration is measured in m/s^2) */
+  // /* Display the results (acceleration is measured in m/s^2) */
   // Serial.print("\t\tAccel X: ");
   // Serial.print(accel.acceleration.x);
   // Serial.print(" \tY: ");
@@ -886,7 +985,7 @@ void loop() {
   // Serial.print(accel.acceleration.z);
   // Serial.println(" m/s^2 ");
 
-  /* Display the results (rotation is measured in rad/s) */
+  // /* Display the results (rotation is measured in rad/s) */
   // Serial.print("\t\tGyro X: ");
   // Serial.print(gyro.gyro.x);
   // Serial.print(" \tY: ");
@@ -895,130 +994,31 @@ void loop() {
   // Serial.print(gyro.gyro.z);
   // Serial.println(" radians/s ");
   // Serial.println();
-  
-  if (ble.available()) {                                                  // if there is data to be read from the phone serial
-    String message = ble.readStringUntil('\n');                           // reads the message until there is a new line
-    message.toLowerCase();
-    if (message == "start monitoring") {
-      monitor = true;                                                     // boolean for flex sensor
-      ble.println("started");
-    }
-    else if (message == "stop monitoring") {
-      monitor = false;
-      ble.println("stopped");
-    }
-    else if (message == "do wrist turns") {
-      ble.println("how many?");
-      while (!ble.available()) { 
-        delay(100);                                                       // delay until there is data to be read from the phone (otherwise the code runs so fast it will skip over the phone input)
-        Serial.print(".");
-      }
-      String str = ble.readStringUntil('\n');
-      ble.println(str);
-      wristTurns = str.toInt();
-      Serial.println(wristTurns);
-      exercise = true;
-    }
-    else if (message == "menu") {
-      ble.println("1. 'start monitoring' - allows the device to monitor the angle of your wrist and beep if the angle is too steep");
-      ble.println("2. 'stop monitoring' - the device will stop monitoring the angle of your wrist, mainly used when sleeping");
-      ble.println("3. 'do wrist turns' - you will be prompted to enter the amount of wrist turns you do and it will monitor how many you do");
-    }
-  }
 
-  if (monitor) {                                                          // will start monitoring the angle of the wrist if monitor is true, will not if it's false
-    int flexValue;
-    flexValue = analogRead(flexPin);                                      // converts the analog voltage to readable digital data
-    float voltage = flexValue * (3.3/4095.0);                             // converts the digital data to voltage
-    float flexResistance = fixedResistance * (3.3/voltage - 1.0);         // converts voltage to resistance
-    Serial.println(String(flexResistance) + " resistance");
-    float angle = map(flexResistance, 15000, 45000, 0.0, 90.0);           // converts resistance to angle it's bent at
-    Serial.println("flexValue: "+ String(flexValue));
-    Serial.print("angle: ");
-    Serial.println(String(angle) + " degrees");
-    if (angle >= 21) {
-      ble.println("Tilt wrist up");
-      tone(buzzer, 5000);                                                 // piezo buzzer buzzes
-    }
-    else if(angle <= -7) {
-      ble.println("Tilt wrist down");
-      tone(buzzer, 5000);
-    }
-    else {
-      noTone(buzzer);
-    }
-  }
-  
-  else {
-    noTone(buzzer);
-  }
+  int flexValue;
+  flexValue = analogRead(flexPin);
+  float voltage = flexValue * (3.3/4095.0);
+  float flexResistance = fixedResistance * (3.3/voltage - 1.0);
+  //Serial.println(flexResistance);
+  float angle = map(flexResistance, 12000, 28000, 0.0, 90.0);
+  Serial.print("angle: ");
+  Serial.println(String(angle) + " degrees");
   
 
-  filter.updateIMU((gyro.gyro.x * 180)/PI, 
-  (gyro.gyro.y * 180)/PI, (gyro.gyro.z * 180)/PI, 
-  accel.acceleration.x, accel.acceleration.y, accel.acceleration.z);      // Madgwick filter updates its values
-
-  if (repCount < wristTurns && exercise) {                                // will run if the use wants to do wrist turns
-    if (!calibrated) {                                                    // calibrating
-      if (filter.getPitch() <= 2 && filter.getPitch() >= -2) {
-        Serial.print("Filter angles: ");
-        Serial.print(filter.getRoll());
-        Serial.print(" ");
-        Serial.print(filter.getYaw());
-        Serial.print(" ");
-        Serial.println(filter.getPitch());
-        ble.println("Calibrating.....");
-        countSeconds++;
-        if (countSeconds == 60) {                                         // if the pitch value of wrist is between 2 and -2 for 3 seconds
-          calibrated = true;
-          ble.println("Calibrated! You can begin");
-          countSeconds = 0;
-        }
-      }
-      else {
-        Serial.print("Filter angles: ");
-        Serial.print(filter.getRoll());
-        Serial.print(" ");
-        Serial.print(filter.getYaw());
-        Serial.print(" ");
-        Serial.println(filter.getPitch());
-        ble.println("Straighten out your wrist");
-        countSeconds = 0;
-      }
-    }
-    
-    if (calibrated) { 
-      if (filter.getPitch() >= 42) {                                      // if wrist is pointed down and the pitch value exceeds 42
-        waiting4Raise = true;                                             // boolean for waiting for the wrist to go up
-        repStart = currentTime;                                           // the starting time of the rep
-      }
-
-      if (waiting4Raise && currentTime - repStart <= 2000) {              // if waiting4Raise is true and the time between the current time and the start time is less than 2 seconds
-        if (filter.getPitch() <= -56) {                                   // if the wrist is pointed up and the pitch value is less than -56
-          repCount += 1;
-          tone(buzzer, 3000, 500);                                        // buzz
-          ble.println(repCount);
-          waiting4Raise = false;
-        }
-      }
-    }
-
-    if (repCount == wristTurns) {                                         // the goal has been reached
-      ble.println("Congrats! You're done!");
-      repCount = 0;
-      exercise = false;
-      calibrated = false;
-      tone(buzzer, 4000, 500);                                            // buzzer indicating that process is done
-      delay(1000);
-      tone(buzzer, 4000, 500);
-      delay(1000);
-      tone(buzzer, 4000, 500);
-    }
+  filter.updateIMU(gyro.gyro.x, gyro.gyro.y, gyro.gyro.z, accel.acceleration.x, accel.acceleration.y, accel.acceleration.z);
+  Serial.print("Filter angles: ");
+  Serial.print(filter.getRoll());
+  Serial.print(" ");
+  Serial.print(filter.getYaw());
+  Serial.print(" ");
+  Serial.println(filter.getPitch());
+  
+  if (filter.getPitch() < -35 || filter.getPitch() > 30 || angle > 30 || angle < -5) {
+    Serial.println("fix posture");
   }
 
 
-
-  delay(50);
+  delay(100);
 
   //  // serial plotter friendly format
 
