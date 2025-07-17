@@ -809,7 +809,7 @@ void loop() {
 }
 ```
 
-## Third Milestone
+## First Milestone
 ```c++
 // Basic demo for accelerometer/gyro readings from Adafruit LSM6DS3TR-C
 const int flexPin = A6;
