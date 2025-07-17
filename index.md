@@ -17,7 +17,7 @@ Replace this text with a brief description (2-3 sentences) of your project. This
 ## Description
 For my third milestone, I soldered my flex sensor onto two wires so that it didn't have to be stuck to the breadbaord for it to work. When I was soldering though, I accidentally broke one of the metal legs off the sensor, so I had directly solder the jumper wire on the metal base instead of soldering the leg to the wire. Luckily, it still works the same and transfers electrical current smoothly. After I soldered it, I stuck it to the adhesive side of a piece of velcro and then attached the velcro to my compression sleeve. I also sewed my accelerometer onto my sleeve, and I added a 220 ohm resistor to my piezo buzzer to reduce the volume a bit.
 
-<img src="sensorsewed.png" width="300"/>
+<img src="sensorsewed.jpg" width="300"/>
 Figure #1: The sensor velcroed on the wrist sleeve and the accelerometer also sewed on
 
 ## Challenges
