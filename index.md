@@ -17,11 +17,11 @@ Replace this text with a brief description (2-3 sentences) of your project. This
 ## Description
 For my third milestone, I soldered my flex sensor onto two wires so that it didn't have to be stuck to the breadbaord for it to work. When I was soldering though, I accidentally broke one of the metal legs off the sensor, so I had directly solder the jumper wire on the metal base instead of soldering the leg to the wire. Luckily, it still works the same and transfers electrical current smoothly. After I soldered it, I stuck it to the adhesive side of a piece of velcro and then attached the velcro to my compression sleeve. I also sewed my accelerometer onto my sleeve, and I added a 220 ohm resistor to my piezo buzzer to reduce the volume a bit.
 
-![Headstone Image](sensorsewed.jpg)
+<img src="sensorsewed.png" width="300"/>
 Figure #1: The sensor velcroed on the wrist sleeve and the accelerometer also sewed on
 
 ## Challenges
-The main challenges I had were after I soldered the flex sensor. For some reason, when I tested it, my angle values started to jump a lot, sometimes randomly shooting to really high values and sometimes decreasing to -67 degrees. When I debugged it, I noticed the flex value was going up to 4095.0, which is the maximum digital value the flex sensor can output. That meant there was a short somewhere, which means that power is connecting to ground. After looking at my soldering, I realized one of the copper strands of the jumper wire was touching one of the metal pins on the back of the flex sensor which was causing the flex sensor to bug out. After I removed the strand, the flex sensor stopped fluctuating like crazy. But, the angles were still wrong. For example, when my wrist was straight, the angle outputed was about 20 degrees. I concluded that the threshold for the map() function needed to be changed, because maybe the velcro caused the sensor to bend weirdly. As shown in the figure below, the circled parameters are the threshold, with 15000 corresponding to 0 degrees and 45000 resistance corresponding to 90 degrees. After I tweaked the parameters for the map() function, everything started working normally.
+The main challenges I had were after I soldered the flex sensor. For some reason, when I tested it, my angle values started to jump a lot, sometimes randomly shooting to really high values and sometimes decreasing to -67 degrees. When I debugged it, I noticed the flex value was going up to 4095.0, which is the maximum digital value the flex sensor can output. That meant there was a short somewhere, which means that power is connecting to ground. After looking at my soldering, I realized one of the copper strands of the jumper wire was touching one of the metal pins on the back of the flex sensor which was causing the flex sensor to output really extreme values. After I removed the strand, the flex sensor stopped outputing extremely fluctuating values. But, the angles were still wrong. For example, when my wrist was straight, the angle outputed was about 20 degrees. I concluded that the threshold for the map() function needed to be changed, because maybe the velcro caused the sensor to bend weirdly. As shown in the figure below, the circled parameters are the threshold, with 15000 corresponding to 0 degrees and 45000 resistance corresponding to 90 degrees. After I tweaked the parameters for the map() function, everything started working normally.
 
 ![Headstone Image](mapfunction.jpg)
 
@@ -54,7 +54,7 @@ For the accelerometer, I really didn't change much. I still used the Madgwick fi
 Figure #5: The flow chart of my wrist turn code
 
 ### Bluetooth
-Since the ESP32 already has a built in Bluetooth module, I didn't have to use the HC05. Implementing the Bluetooth module was not too complicated. I first downloaded the BleSerial library on Arduino and created a BleSerial object in my code. The BleSerial object is the serial on my phone, and creating it allows me to actually run code that uses it. I then downloaded the BLESerialnRF52 app on my phone, since downloading an app is the only way to open a serial on a phone. I then figured out how to communicate between the two serials using code. It mainly consisted of using the available() function to check if there was data to be read, then using the read() function to read the data. Then with that data I could do whatever I wanted. I realized I could use this communication to write commands on my phone. I tweaked the code so that the device would do things based on the commands I typed on my phone serial. For example, if I typed "start monitoring" on my phone, the device would start monitoring the angle of the flex sensor and allowing the buzzer to beep. Or, if I wanted to do a certain amount of wrist turns, I could type in "do wrist turns" on my serial and also type in how many I want to do.
+Since the ESP32 already has a built in Bluetooth module, I didn't have to use the HC05. Implementing the Bluetooth module was not too complicated. I first downloaded the BleSerial library on Arduino and created a BleSerial object in my code. The BleSerial object is the serial on my phone, and creating it allows me to actually run code that uses it. I then downloaded the BLESerialnRF52 app on my phone, since downloading an app is the only way to open a serial on a phone. I then figured out how to communicate between the two serials using code. It mainly consisted of using the available() function to check if there was data to be read, then using the read() function to read the data. Then with that data I could do whatever I wanted. I realized I could use this communication to write commands on my phone. I tweaked the code so that the device would do things based on the commands I typed on my phone serial. For example, if I typed "start monitoring" on my phone, the device would start monitoring the angle of the flex sensor and allowing the buzzer to beep. Or, if I wanted to do a certain amount of wrist turns, I could type in "do wrist turns" on my serial and also type in how many I want to do. (Refer to the milestone 2 code in the code appendix to see how I coded the bluetooth serial)
 
 ![Headstone Image](bleandesp.jpg)
 Figure #6: The BLESerialnRF52 app and ESP32
@@ -107,7 +107,7 @@ Figure #11: Schematic for flex sensor and accelerometer
 
 ## Code
 
-Figure #12: Code for first milestone
+Code for first milestone
 ```c++
 // Basic demo for accelerometer/gyro readings from Adafruit LSM6DS3TR-C
 const int flexPin = A6;
@@ -335,7 +335,7 @@ void loop() {
   //  delayMicroseconds(10000);
 }
 ```
-Figure #13: Code for second milestone
+Code for second milestone
 ```c++
 // Basic demo for accelerometer/gyro readings from Adafruit LSM6DS3TR-C
 const int flexPin = A6;
@@ -688,7 +688,7 @@ void loop() {
   //  delayMicroseconds(10000);
 }
 ```
-Figure #14: Code for milestone 3
+Code for milestone 3
 ```c++
 // Basic demo for accelerometer/gyro readings from Adafruit LSM6DS3TR-C
 const int flexPin = A6;
