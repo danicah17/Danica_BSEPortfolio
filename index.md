@@ -28,7 +28,7 @@ The main challenges I had were after I soldered the flex sensor. For some reason
 ## Schematic
 
 ![Headstone Image](milestone3schematic.jpg)
-Figure #1: schematic of flex sensor, accelerometer, piezo buzzer with resistor
+Figure #1: Schematic of flex sensor, accelerometer, piezo buzzer with resistor
 
 
 
