@@ -17,7 +17,7 @@ Replace this text with a brief description (2-3 sentences) of your project. This
 ## Description
 For my third milestone, I soldered my flex sensor onto two wires so that it didn't have to be stuck to the breadbaord for it to work. When I was soldering though, I accidentally broke one of the metal legs off the sensor, so I had directly solder the jumper wire on the metal base instead of soldering the leg to the wire. Luckily, it still works the same and transfers electrical current smoothly. After I soldered it, I stuck it to the adhesive side of a piece of velcro and then attached the velcro to my compression sleeve. I also sewed my accelerometer onto my sleeve, and I added a 220 ohm resistor to my piezo buzzer to reduce the volume a bit.
 
-<img src="sensorsewed.jpg" width="300"/>
+<img src="sensorsewed.jpg" width="300"/>              
 
 Figure #1: The sensor velcroed on the wrist sleeve and the accelerometer also sewed on
 
@@ -43,6 +43,7 @@ Figure #3: Schematic of flex sensor, accelerometer, piezo buzzer with resistor
 For my second milestone, I actually changed the function of my accelerometer. Since my flex sensor already functions to monitor the angle of my wrist, I coded it to help monitor the number of wrist turns you do. I also added a piezo buzzer onto my board so it can beep for different purposes. Finally, I incoporated the Bluetooth module that's built on the ESP32 so I can wirelessly transmit information from my phone to the computer and the Arduino. Using the Bluetooth, I added commands that I can type out on my phone to tell the device to do something.
 
 <img src="commands.jpg" width="300"/>
+
 Figure #4: The commands I can type on my phone
 
 ### Piezo Buzzer
