@@ -17,15 +17,17 @@ You should comment out all portions of your portfolio that you have not complete
   
 # Final Milestone
 
-<!--- **Don't forget to replace the text below with the embedding for your milestone video. Go to Youtube, click Share -> Embed, and copy and paste the code to replace what's below.** -->
-
 <iframe width="560" height="315" src="https://www.youtube.com/embed/QXzdbDnVNSE?si=XcitFkKb1wY44uV0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 ## Description
 For my third milestone, I soldered my flex sensor onto two wires so that it didn't have to be stuck to the breadbaord for it to work. When I was soldering though, I accidentally broke one of the metal legs off the sensor, so I had directly solder the jumper wire on the metal base instead of soldering the leg to the wire. Luckily, it still works the same and transfers electrical current smoothly. After I soldered it, I stuck it to the adhesive side of a piece of velcro and then attached the velcro to my compression sleeve. I also sewed my accelerometer onto my sleeve, and I added a 220 ohm resistor to my piezo buzzer to reduce the volume a bit.
 
+## Challenges
+The main challenges I had were after I soldered the flex sensor. For some reason, when I tested it, my angle values started go crazy, sometimes randomly shooting to really high values and sometimes decreasing to -67 degrees. When I debugged it, I noticed the flex value was going up to 4095.0, which is the maximum digital value the flex sensor can output. That meant there was a short somewhere, which means that power is connecting to ground. After looking at my soldering, I realized one of the copper strands of the jumper wire was touching one of the metal pins on the back of the flex sensor which was causing the flex sensor to bug out. After I removed the strand, the flex sensor stopped fluctuating like crazy. But, the angles were still wrong. For example, when my wrist was straight, the angle outputed was about 20 degrees. I concluded that the threshold for the map() function needed to be changed, because maybe the velcro caused the sensor to bend weirdly. After I tweaked the parameters for the map() function, everything started working normally.
+
 ## Schematic
-![Headstone Image]
+
+![Headstone Image](milestone3schematic.jpg)
 Figure #1: schematic of flex sensor, accelerometer, piezo buzzer with resistor
 
 
@@ -44,13 +46,13 @@ The piezo buzzer is an output device, so I tell it what to do in my code. I can 
 For the accelerometer, I really didn't change much. I still used the Madgwick filter to convert the values of the gyroscope and the accelerometer into orientations along the roll, pitch, and yaw axes. The only difference was how I used the values along the pitch axes. The code I had to write had a lot of checks and I had to make many global variables. For starters, I needed to make sure that the code block for wrist turns would only run when I commanded it to. I made a boolean called exercise and made it so the code block would only run if exercise was set to true. Next, I made a boolean called calibrated. To make it true, I have to make sure my wrist is straight and the pitch values were between 2 and -2 for at least 3 seconds. Once the device is calibrated, I can start doing my wrist turns. For my wrist turns, I made an another boolean called waiting4Raise. Once my wrist is pointed downwards and has a pitch value that is bigger than 42, waiting4Raise becomes true and a timer starts. waiting4Raise basically means that the device is waiting for me to move my wrist upward, since I already moved it down. If within 2 seconds my wrist is pointed up and the pitch value is less than -56, the rep count increases since that counts as a complete wrist turn. After one wrist turn, waiting4Raise is set back to false. If I have completed all of my wrist turns, exercise is set to false, calibrated is also set to false, and the rep count is set back to 0.
 
 ![Headstone Image](Programming flowchart example.jpeg)
-Figure #1: The flow chart of my wrist turn code
+Figure #2: The flow chart of my wrist turn code
 
 ### Bluetooth
 Since the ESP32 already has a built in Bluetooth module, I didn't have to use the HC05. Implementing the Bluetooth module was not too complicated. I first downloaded the BleSerial library on Arduino and created a BleSerial object in my code. The BleSerial object is the serial on my phone, and creating it allows me to actually run code that uses it. I then downloaded the BLESerialnRF52 app on my phone, since downloading an app is the only way to open a serial on a phone. I then figured out how to communicate between the two serials using code. It mainly consisted of using the available() function to check if there was data to be read, then using the read() function to read the data. Then with that data I could do whatever I wanted. I realized I could use this communication to write commands on my phone. I tweaked the code so that the device would do things based on the commands I typed on my phone serial. For example, if I typed "start monitoring" on my phone, the device would start monitoring the angle of the flex sensor and allowing the buzzer to beep. Or, if I wanted to do a certain amount of wrist turns, I could type in "do wrist turns" on my serial and also type in how many I want to do.
 
 ![Headstone Image](bleandesp.jpg)
-Figure #2: The BLESerialnRF52 app and ESP32
+Figure #3: The BLESerialnRF52 app and ESP32
 
 ## Challenges
 One of my challenges was that for some reason, when I was first testing my accelerometer for the wrist turns, the Madgwick filter was updating really slowly even though the frequency it was updating at was already really fast. I even tried upping the frequency, but that didn't change anything. Some time later, the code stopped uploading entirely and my serial port disappeared from my board menu in Arduino even though everything was plugged in. After trying to restart my computer and the Arduino app, I unplugged my device from the first charging port on my computer and plugged it into the second charging port. That charging port probably allowed more connection with the board, because once I plugged it into that port, the serial port showed up again and allowed me to upload code. My accelerometer also started updating at the correct speed when I uploaded my code. The second challenge that I had was when I tried to use the toLowerCase() method in my code. The toLowerCase() method is a void function, which means it doesn't return anything when I call it. But, since in Java though it returns a string, I assumed it was the same in C++. I basically tried to set a variable to nothing, so the code kept giving me errors. I realized that the method updates the string itself, so I needed to first call the method, and then set the variable to that updated string. The third challenge I had was with the write() function when working with the phone and computer serials. The write() function is the print() method, except it converts ASCII values to actual text when it prints. But, write() didn't work for the phone serial, only print() worked. To fix it, instead of using the read() function when reading in data, I used the readStringUntil() function, which automatically returns the string in its text form. Then I just printed that string onto the phone serial.
@@ -58,7 +60,7 @@ One of my challenges was that for some reason, when I was first testing my accel
 ## Schematic
 
 ![Headstone Image](milestone2schematic.jpg)
-Figure #3: Schematic for flex sensor, accelerometer, and piezo buzzer
+Figure #4: Schematic for flex sensor, accelerometer, and piezo buzzer
 
 # First Milestone
 
@@ -72,20 +74,20 @@ The flex sensor is a resistor, and the more it bends the more resistance it will
 
 ![Headstone Image](flex sensor.png)
 
-Figure #4: Flex sensor
+Figure #5: Flex sensor
 
 ### Converting Digital Data to Angles
 The first equation I used was (flexValue * (3.3/4095.0)). FlexValue is the digital data that the Arduino outputs, 3.3 is the max analog value (aka voltage) the ESP32 is able to output, and 4095.0 is the corresponding max digital value. This equation helps convert the digital data to voltage. The next equation I used was (10000 * (3.3/voltage - 1.0)). The 10000 is the resistance of the flex sensor when it is straight, the 3.3 is again the max value of voltage the ESP32 can output, and the voltage is the voltage found from the previous equation. The equation is used to convert the voltage to the amount of resistance the flex sensor is applying. After I used those 2 equations to find the resistance, I used a function called map() that actually helps convert those resistance values into angles. The map() function takes in a few parameters so know what resistance value counts as 0 degrees and what counts as 90 degrees. I set the optimal wrist degree to 30 degrees, which means if the flex sensor ever bends past 30 degrees the computer will print out a message warning me to fix my wrist posture. 
 
 ![Headstone Image](equations.jpg)
-Figure #5: Equations that I used
+Figure #6: Equations that I used
 
 ### Accelerometer and Madgwick Filter
 For the accelerometer, since it measures both values of a gyroscope (rotation speed) and an accelerometer (acceleration) along the x, y, and z axes, it outputs 6 values at a time. I ended up using a Madgwick filter to help convert all of those values into the orientationos of the object along the roll, yaw, and pitch axes. The roll, pitch, and yaw axes are the main axes that planes use in the air. I again set a threshold for the pitch axis, since the pitch axis is what the wrist technically rotates around. That threshold will also indicate if I need to fix my posture.
 
 ![Headstone Image](rollpitchyaw.jpg)
 
-Figure #6: Roll, pitch, and yaw axes
+Figure #7: Roll, pitch, and yaw axes
 
 ## Challenges
 One of the challenges was I had was adjusting the conversion equations. The ones I found online were for the Arduino Uno board, and since I'm using the ESP32 board, the equations were giving me the wrong values. The voltage was 5 instead of 3.3, and the corresponding digital was 1023.0 instead of 4095.0. I had to adjust those values according to the ranges of the ESP32. But after I adjusted the values, another problem happened. As I bent the flex sensor, the output values would get smaller instead of larger. After analyzing the equations, I concluded I needed to switch the positions of my resistor and my flex sensor on my breadboard, as the way I had originally placed them caused them to send incorrect values to the equation. Another challenge was that the accelerometer also had a gyroscope, so it was giving me 6 values at a time and I didn't know which of the 6 to use. I realized that Arduino has a library called Madgwick that actually filters those 6 values and gives you the position of the accelerometer along the roll, yaw, and pitch axes. I ended up using that filter and using the values it gave me to set a threshold.
@@ -96,11 +98,11 @@ For my next steps, I will first add a piezo buzzer to my ESP32 so that it will b
 ## Schematic
 
 ![Headstone Image](milestone 1 schematic.jpg)
-Figure #7: Schematic for flex sensor and accelerometer
+Figure #8: Schematic for flex sensor and accelerometer
 
 ## Code
 
-Figure 1: Code for first milestone
+Figure #9: Code for first milestone
 ```c++
 // Basic demo for accelerometer/gyro readings from Adafruit LSM6DS3TR-C
 const int flexPin = A6;
@@ -328,7 +330,7 @@ void loop() {
   //  delayMicroseconds(10000);
 }
 ```
-Figure 2: Code for second milestone
+Figure #10: Code for second milestone
 ```c++
 // Basic demo for accelerometer/gyro readings from Adafruit LSM6DS3TR-C
 const int flexPin = A6;
@@ -681,7 +683,7 @@ void loop() {
   //  delayMicroseconds(10000);
 }
 ```
-Figure 3: Code for milestone 3
+Figure #11: Code for milestone 3
 ```c++
 // Basic demo for accelerometer/gyro readings from Adafruit LSM6DS3TR-C
 const int flexPin = A6;
@@ -927,7 +929,7 @@ void loop() {
     Serial.println("flexValue: "+ String(flexValue));
     Serial.print("angle: ");
     Serial.println(String(angle) + " degrees");
-    if (angle >= 23) {
+    if (angle >= 21) {
       ble.println("Tilt wrist up");
       tone(buzzer, 5000);                                                 // piezo buzzer buzzes
     }
