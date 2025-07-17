@@ -17,13 +17,13 @@ Replace this text with a brief description (2-3 sentences) of your project. This
 ## Description
 For my third milestone, I soldered my flex sensor onto two wires so that it didn't have to be stuck to the breadbaord for it to work. When I was soldering though, I accidentally broke one of the metal legs off the sensor, so I had directly solder the jumper wire on the metal base instead of soldering the leg to the wire. Luckily, it still works the same and transfers electrical current smoothly. After I soldered it, I stuck it to the adhesive side of a piece of velcro and then attached the velcro to my compression sleeve. I also sewed my accelerometer onto my sleeve, and I added a 220 ohm resistor to my piezo buzzer to reduce the volume a bit.
 
-[Headstone Image](sensorsewed.jpg)
+![Headstone Image](sensorsewed.jpg)
 Figure #1: The sensor velcroed on the wrist sleeve and the accelerometer also sewed on
 
 ## Challenges
 The main challenges I had were after I soldered the flex sensor. For some reason, when I tested it, my angle values started to jump a lot, sometimes randomly shooting to really high values and sometimes decreasing to -67 degrees. When I debugged it, I noticed the flex value was going up to 4095.0, which is the maximum digital value the flex sensor can output. That meant there was a short somewhere, which means that power is connecting to ground. After looking at my soldering, I realized one of the copper strands of the jumper wire was touching one of the metal pins on the back of the flex sensor which was causing the flex sensor to bug out. After I removed the strand, the flex sensor stopped fluctuating like crazy. But, the angles were still wrong. For example, when my wrist was straight, the angle outputed was about 20 degrees. I concluded that the threshold for the map() function needed to be changed, because maybe the velcro caused the sensor to bend weirdly. As shown in the figure below, the circled parameters are the threshold, with 15000 corresponding to 0 degrees and 45000 resistance corresponding to 90 degrees. After I tweaked the parameters for the map() function, everything started working normally.
 
-[Headstone Image](mapfunction.jpg)
+![Headstone Image](mapfunction.jpg)
 Figure #2: The map function that converts resistance to angle
 
 ## Schematic
@@ -40,7 +40,7 @@ Figure #3: Schematic of flex sensor, accelerometer, piezo buzzer with resistor
 ## Description
 For my second milestone, I actually changed the function of my accelerometer. Since my flex sensor already functions to monitor the angle of my wrist, I coded it to help monitor the number of wrist turns you do. I also added a piezo buzzer onto my board so it can beep for different purposes. Finally, I incoporated the Bluetooth module that's built on the ESP32 so I can wirelessly transmit information from my phone to the computer and the Arduino. Using the Bluetooth, I added commands that I can type out on my phone to tell the device to do something.
 
-[Headstone Image](commands.jpg)
+![Headstone Image](commands.jpg)
 Figure #4: The commands I can type on my phone
 
 ### Piezo Buzzer
