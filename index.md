@@ -9,6 +9,13 @@ Replace this text with a brief description (2-3 sentences) of your project. This
 <!--- **Replace the BlueStamp logo below with an image of yourself and your completed project. Follow the guide [here](https://tomcam.github.io/least-github-pages/adding-images-github-pages-site.html) if you need help.** -->
 
 ![Headstone Image](DanicaH.jpg)
+
+# Modification
+
+## Schematic
+
+![Headstone Image](modschematic.jpg)
+Figure #1: Schematic for flex sensor, accelerometer, piezo buzzer, and LED ring
   
 # Final Milestone
 
@@ -31,7 +38,7 @@ Figure #2: The map function that converts resistance to angle
 ## Schematic
 
 ![Headstone Image](milestone3schematic.jpg)
-Figure #3: Schematic of flex sensor, accelerometer, piezo buzzer with resistor
+Figure #3: Schematic of flex sensor, accelerometer, piezo buzzer
 
 # Second Milestone
 
