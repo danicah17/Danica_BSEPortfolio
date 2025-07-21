@@ -109,7 +109,7 @@ For my next steps, I will first add a piezo buzzer to my ESP32 so that it will b
 
 ## Schematic
 
-![Headstone Image](milestone 1 schematic.jpg)
+![Headstone Image](milestone1schematic.jpg)
 Figure #11: Schematic for flex sensor and accelerometer
 
 # Code
