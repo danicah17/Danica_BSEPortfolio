@@ -114,6 +114,435 @@ Figure #11: Schematic for flex sensor and accelerometer
 
 # Code
 
+## Finalish Code
+```c++
+// Basic demo for accelerometer/gyro readings from Adafruit LSM6DS3TR-C
+const int flexPin = A6;
+const int fixedResistance = 10000;
+const int buzzer = 18;
+const int ledPins[8] = {13, 14, 15, 0, 1, 2, 3, 4};
+unsigned long currentTime = millis();
+unsigned long repStart = 0.0;
+int repCount = 0;
+int wristTurns = 1;
+int countSeconds = 0;
+int pinCounter = 0;
+bool waiting4Raise = false;
+bool calibrated = false;
+bool monitor = false;
+bool exercise = false;
+#include <MadgwickAHRS.h>
+#include <Adafruit_LSM6DS3TRC.h>
+#include <BleSerial.h>
+#include <Adafruit_NeoPixel.h>
+
+
+
+
+// For SPI mode, we need a CS pin
+#define LSM_CS 10
+// For software-SPI mode we need SCK/MOSI/MISO pins
+#define LSM_SCK 13
+#define LSM_MISO 12
+#define LSM_MOSI 11
+#define LED_PIN 5
+#define LED_COUNT 16
+
+Adafruit_NeoPixel ring(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
+Adafruit_LSM6DS3TRC lsm6ds3trc;
+Madgwick filter;
+BleSerial ble;
+
+const float sampleFreq = 20.0;
+
+
+void setup() {
+  Serial.begin(115200);
+  filter.begin(sampleFreq);
+  ble.begin("danica's serial");
+  ring.begin();
+  ring.show();
+  ring.setBrightness(50);
+  while (!Serial)
+    delay(10); // will pause Zero, Leonardo, etc until serial console opens
+
+  Serial.println("Adafruit LSM6DS3TR-C test!");
+
+  if (!lsm6ds3trc.begin_I2C()) {
+    // if (!lsm6ds3trc.begin_SPI(LSM_CS)) {
+    // if (!lsm6ds3trc.begin_SPI(LSM_CS, LSM_SCK, LSM_MISO, LSM_MOSI)) {
+    Serial.println("Failed to find LSM6DS3TR-C chip");
+    while (1) {
+      delay(10);
+    }
+  }
+
+  Serial.println("LSM6DS3TR-C Found!");
+
+  // lsm6ds3trc.setAccelRange(LSM6DS_ACCEL_RANGE_2_G);
+  Serial.print("Accelerometer range set to: ");
+  switch (lsm6ds3trc.getAccelRange()) {
+  case LSM6DS_ACCEL_RANGE_2_G:
+    Serial.println("+-2G");
+    break;
+  case LSM6DS_ACCEL_RANGE_4_G:
+    Serial.println("+-4G");
+    break;
+  case LSM6DS_ACCEL_RANGE_8_G:
+    Serial.println("+-8G");
+    break;
+  case LSM6DS_ACCEL_RANGE_16_G:
+    Serial.println("+-16G");
+    break;
+  }
+
+  // lsm6ds3trc.setGyroRange(LSM6DS_GYRO_RANGE_250_DPS);
+  Serial.print("Gyro range set to: ");
+  switch (lsm6ds3trc.getGyroRange()) {
+  case LSM6DS_GYRO_RANGE_125_DPS:
+    Serial.println("125 degrees/s");
+    break;
+  case LSM6DS_GYRO_RANGE_250_DPS:
+    Serial.println("250 degrees/s");
+    break;
+  case LSM6DS_GYRO_RANGE_500_DPS:
+    Serial.println("500 degrees/s");
+    break;
+  case LSM6DS_GYRO_RANGE_1000_DPS:
+    Serial.println("1000 degrees/s");
+    break;
+  case LSM6DS_GYRO_RANGE_2000_DPS:
+    Serial.println("2000 degrees/s");
+    break;
+  case ISM330DHCX_GYRO_RANGE_4000_DPS:
+    break; // unsupported range for the DS33
+  }
+
+  //lsm6ds3trc.setAccelDataRate(LSM6DS_RATE_20_HZ);
+  Serial.print("Accelerometer data rate set to: ");
+  switch (lsm6ds3trc.getAccelDataRate()) {
+  case LSM6DS_RATE_SHUTDOWN:
+    Serial.println("0 Hz");
+    break;
+  case LSM6DS_RATE_12_5_HZ:
+    Serial.println("12.5 Hz");
+    break;
+  case LSM6DS_RATE_26_HZ:
+    Serial.println("26 Hz");
+    break;
+  case LSM6DS_RATE_52_HZ:
+    Serial.println("52 Hz");
+    break;
+  case LSM6DS_RATE_104_HZ:
+    Serial.println("104 Hz");
+    break;
+  case LSM6DS_RATE_208_HZ:
+    Serial.println("208 Hz");
+    break;
+  case LSM6DS_RATE_416_HZ:
+    Serial.println("416 Hz");
+    break;
+  case LSM6DS_RATE_833_HZ:
+    Serial.println("833 Hz");
+    break;
+  case LSM6DS_RATE_1_66K_HZ:
+    Serial.println("1.66 KHz");
+    break;
+  case LSM6DS_RATE_3_33K_HZ:
+    Serial.println("3.33 KHz");
+    break;
+  case LSM6DS_RATE_6_66K_HZ:
+    Serial.println("6.66 KHz");
+    break;
+  }
+
+  // lsm6ds3trc.setGyroDataRate(LSM6DS_RATE_12_5_HZ);
+  Serial.print("Gyro data rate set to: ");
+  switch (lsm6ds3trc.getGyroDataRate()) {
+  case LSM6DS_RATE_SHUTDOWN:
+    Serial.println("0 Hz");
+    break;
+  case LSM6DS_RATE_12_5_HZ:
+    Serial.println("12.5 Hz");
+    break;
+  case LSM6DS_RATE_26_HZ:
+    Serial.println("26 Hz");
+    break;
+  case LSM6DS_RATE_52_HZ:
+    Serial.println("52 Hz");
+    break;
+  case LSM6DS_RATE_104_HZ:
+    Serial.println("104 Hz");
+    break;
+  case LSM6DS_RATE_208_HZ:
+    Serial.println("208 Hz");
+    break;
+  case LSM6DS_RATE_416_HZ:
+    Serial.println("416 Hz");
+    break;
+  case LSM6DS_RATE_833_HZ:
+    Serial.println("833 Hz");
+    break;
+  case LSM6DS_RATE_1_66K_HZ:
+    Serial.println("1.66 KHz");
+    break;
+  case LSM6DS_RATE_3_33K_HZ:
+    Serial.println("3.33 KHz");
+    break;
+  case LSM6DS_RATE_6_66K_HZ:
+    Serial.println("6.66 KHz");
+    break;
+  }
+
+  lsm6ds3trc.configInt1(false, false, true); // accelerometer DRDY on INT1
+  lsm6ds3trc.configInt2(false, true, false); // gyro DRDY on INT2
+  pinMode(buzzer, OUTPUT);
+}
+
+void loop() {
+  // Get a new normalized sensor event
+  sensors_event_t accel;
+  sensors_event_t gyro;
+  sensors_event_t temp;
+  lsm6ds3trc.getEvent(&accel, &gyro, &temp);
+
+  // Serial.print("\t\tTemperature ");
+  // Serial.print(temp.temperature);
+  // Serial.println(" deg C");
+
+  /* Display the results (acceleration is measured in m/s^2) */
+  // Serial.print("\t\tAccel X: ");
+  // Serial.print(accel.acceleration.x);
+  // Serial.print(" \tY: ");
+  // Serial.print(accel.acceleration.y);
+  // Serial.print(" \tZ: ");
+  // Serial.print(accel.acceleration.z);
+  // Serial.println(" m/s^2 ");
+
+  /* Display the results (rotation is measured in rad/s) */
+  // Serial.print("\t\tGyro X: ");
+  // Serial.print(gyro.gyro.x);
+  // Serial.print(" \tY: ");
+  // Serial.print(gyro.gyro.y);
+  // Serial.print(" \tZ: ");
+  // Serial.print(gyro.gyro.z);
+  // Serial.println(" radians/s ");
+  // Serial.println();
+  
+  if (ble.available()) {                                                  // if there is data to be read from the phone serial
+    String message = ble.readStringUntil('\n');                           // reads the message until there is a new line
+    message.toLowerCase();
+    if (message == "start monitoring") {
+      monitor = true;                                                     // boolean for flex sensor
+      ble.println("started");
+    }
+    else if (message == "stop monitoring") {
+      monitor = false;
+      ble.println("stopped");
+    }
+    else if (message == "do wrist turns") {
+      ble.println("how many?");
+      while (!ble.available()) { 
+        delay(100);                                                       // delay until there is data to be read from the phone (otherwise the code runs so fast it will skip over the phone input)
+        Serial.print(".");
+      }
+      String str = ble.readStringUntil('\n');
+      wristTurns = str.toInt();
+      ble.println(wristTurns);
+      exercise = true;
+    }
+    else if (message == "menu") {
+      ble.println("1. 'start monitoring' - allows the device to monitor the angle of your wrist and beep if the angle is too steep");
+      ble.println("2. 'stop monitoring' - the device will stop monitoring the angle of your wrist, mainly used when sleeping");
+      ble.println("3. 'do wrist turns' - you will be prompted to enter the amount of wrist turns you do and it will monitor how many you do");
+    }
+  }
+
+  if (monitor) {                                                          // will start monitoring the angle of the wrist if monitor is true, will not if it's false
+    int flexValue;
+    flexValue = analogRead(flexPin);                                      // converts the analog voltage to readable digital data
+    float voltage = flexValue * (3.3/4095.0);                             // converts the digital data to voltage
+    float flexResistance = fixedResistance * (3.3/voltage - 1.0);         // converts voltage to resistance
+    Serial.println(String(flexResistance) + " resistance");
+    float angle = map(flexResistance, 15000, 45000, 0.0, 90.0);           // converts resistance to angle it's bent at
+    Serial.println("flexValue: "+ String(flexValue));
+    Serial.print("angle: ");
+    Serial.println(String(angle) + " degrees");
+    if (angle >= 30) {
+      ble.println("Tilt wrist up");
+      tone(buzzer, 5000);                                                 // piezo buzzer buzzes
+      for (int i = 0; i < 8; i++) {
+        ring.setPixelColor(ledPins[i], 255, 0, 0);
+        ring.show();
+      }
+      for (int i = 5; i <= 12 ; i++) {
+        ring.setPixelColor(i, 0, 255, 0);
+        ring.show();
+      }
+    }
+    else if (angle <= -5) {
+      ble.println("Tilt wrist down");
+      tone(buzzer, 5000);
+      for (int i = 0; i < 8; i++) {
+        ring.setPixelColor(ledPins[i], 0, 255, 0);
+        ring.show();
+      }
+      for (int i = 5; i <= 12 ; i++) {
+        ring.setPixelColor(i, 255, 0, 0);
+        ring.show();
+      }
+    }
+    else {
+      noTone(buzzer);
+      ring.clear();
+      ring.show();
+    }
+  }
+  
+  else {
+    noTone(buzzer);
+  }
+  
+
+  filter.updateIMU((gyro.gyro.x * 180)/PI, 
+  (gyro.gyro.y * 180)/PI, (gyro.gyro.z * 180)/PI, 
+  accel.acceleration.x, accel.acceleration.y, accel.acceleration.z);      // Madgwick filter updates its values
+
+  if (repCount < wristTurns && exercise) {                                // will run if the use wants to do wrist turns
+    if (!calibrated) {                                                    // calibrating
+      if (filter.getPitch() <= 2 && filter.getPitch() >= -2) {
+        Serial.print("Filter angles: ");
+        Serial.print(filter.getRoll());
+        Serial.print(" ");
+        Serial.print(filter.getYaw());
+        Serial.print(" ");
+        Serial.println(filter.getPitch());
+        ble.println("Calibrating.....");
+        ring.setPixelColor(pinCounter, 0, 0, 255);
+        ring.show();
+        pinCounter++;
+        delay(50);
+        if (pinCounter == ring.numPixels()) {
+          pinCounter = 0;
+          ring.clear();
+          ring.show();
+          delay(50);
+        }
+        countSeconds++;
+        if (countSeconds == 60) {                                         // if the pitch value of wrist is between 2 and -2 for 3 seconds
+          calibrated = true;
+          ble.println("Calibrated! You can begin");
+          countSeconds = 0;
+          pinCounter = 0;
+          ring.clear();
+          ring.show();
+        }
+      }
+      else {
+        Serial.print("Filter angles: ");
+        Serial.print(filter.getRoll());
+        Serial.print(" ");
+        Serial.print(filter.getYaw());
+        Serial.print(" ");
+        Serial.println(filter.getPitch());
+        ble.println("Straighten out your wrist");
+        countSeconds = 0;
+      }
+    }
+    
+    if (calibrated) { 
+      if (filter.getPitch() >= 26) {                                      // if wrist is pointed down and the pitch value exceeds 42
+        waiting4Raise = true;                                             // boolean for waiting for the wrist to go up
+        repStart = currentTime;                                           // the starting time of the rep
+      }
+      Serial.print("wrist turn angles: ");
+      Serial.print(filter.getRoll());
+      Serial.print(" ");
+      Serial.print(filter.getYaw());
+      Serial.print(" ");
+      Serial.println(filter.getPitch());
+
+      if (waiting4Raise && currentTime - repStart <= 2000) {              // if waiting4Raise is true and the time between the current time and the start time is less than 2 seconds
+        if (filter.getPitch() <= -34) {                                   // if the wrist is pointed up and the pitch value is less than -56
+          repCount += 1;
+          tone(buzzer, 3000, 500);                                        // buzz
+          ring.setPixelColor(pinCounter, 0, 255, 0);
+          ring.show();
+          pinCounter++;
+          if (pinCounter == ring.numPixels()) {
+            pinCounter = 0;
+          }
+          ble.println(repCount);
+          waiting4Raise = false;
+        }
+      }
+    }
+
+    if (repCount == wristTurns) {                                         // the goal has been reached
+      ble.println("Congrats! You're done!");
+      repCount = 0;
+      exercise = false;
+      calibrated = false;
+      play();
+      delay(500);
+      pinCounter = 0;
+      rainbow(1);
+      ring.clear();
+      ring.show();
+    }
+  }
+
+
+
+  delay(50);
+
+  //  // serial plotter friendly format
+
+  //  Serial.print(temp.temperature);
+  //  Serial.print(",");
+
+  //  Serial.print(accel.acceleration.x);
+  //  Serial.print(","); Serial.print(accel.acceleration.y);
+  //  Serial.print(","); Serial.print(accel.acceleration.z);
+  //  Serial.print(",");
+
+  // Serial.print(gyro.gyro.x);
+  // Serial.print(","); Serial.print(gyro.gyro.y);
+  // Serial.print(","); Serial.print(gyro.gyro.z);
+  // Serial.println();
+  //  delayMicroseconds(10000);
+}
+void rainbow(int wait) {
+  for(long firstPixelHue = 0; firstPixelHue < 5*65536; firstPixelHue += 256) {
+    for(int i= 0; i<ring.numPixels(); i++) { 
+      int pixelHue = firstPixelHue + (i * 65536L / ring.numPixels());
+      ring.setPixelColor(i, ring.gamma32(ring.ColorHSV(pixelHue)));
+    }
+    ring.show();
+    delay(wait);
+  }
+}
+
+void play() {
+  delay(500);
+  tone(buzzer, 880, 500);                                            // buzzer indicating that process is done
+  delay(250);
+  tone(buzzer, 988, 500);
+  delay(250);
+  tone(buzzer, 1046, 500);
+  delay(250);
+  tone(buzzer, 1174, 500);
+  delay(250);
+  tone(buzzer, 1318, 500);
+  delay(250);
+  tone(buzzer, 1396, 500);
+  delay(250);
+  tone(buzzer, 1568, 500);
+  delay(250);
+  tone(buzzer, 1760, 500);
+}
+```
+
 ## Third Milestone
 ```c++
 // Basic demo for accelerometer/gyro readings from Adafruit LSM6DS3TR-C
