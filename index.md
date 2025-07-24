@@ -12,6 +12,17 @@ Replace this text with a brief description (2-3 sentences) of your project. This
 
 # Modification
 
+## Description
+For my modification, I added a 16 bit Neopixel LED ring to my device. I coded it so that it could light up for different purposes, such as the front half of it lighting up red when my wrist is tilted downwards too much. I also implemented the rainbow function that exists in the library, letting it light up rainbow once my goal of wrist turns is reached. Besides adding an LED ring, I also added a command on my phone which lets me calibrate my own values for my flex sensor to use as the parameters of the map() function.
+
+### Adafruit 16 Bit Neopixel LED Ring
+How the ring works is that it is an output device, so I have to connect my ESP32 to the D-in pin on the ring to allow data to come through. Also, for it to work, I have to tell it what to do in my code, using functions from the Adafruit_Neopixel library. The ring has 16 bits, or 16 lights, and I can code each of them can light up as different color at the same time. It needs 5V voltage as its power, so I ended up connecting it to the V-in pin on the ESP32. The ESP32 usually trasmits 3.3V as its max, but it's because the board alters the voltage it receives from the computer and the USB-C cable. The V-in pin is an exception, so it allows whatever it is connecting to to directly tap into 5V without allowing the ESP32 to lower the voltage.
+
+### Calibrating the Flex Sensor
+Even though I had apparently fixed the threshold of my resistance values in my third milestone, every time I sewed something onto my wrist sleeve, the values my flex sensor outputted would fluctuate a lot, and I would have to change the parameters of my map() function. Eventually, I decided that since the values were different every time I tested it, I would calibrate the values at the start of my code so I didn't have to manually fix the parameters every time. I first made a boolean called flexCalibrate which would only be set to true during the first loop of my code. This would allow me to only calibrate my flex sensor when I first start using it. Then, I created a for loop to run 50 times while I straightened my wrist, which will measure the resistance each time (using the same equations I used in milestone 1) and add it to a variable called total. After the for loop, I divided the total by 50 to find the average, which will be used as the corresponding resistance value for 0 degrees. I then set total back to 0, and repeated the code process but with me holding my wrist at a 40 degree angle and the average being the corresponding value for 40 degrees. Since usually injured users wouldn't be able to bend their wrist at 90 degrees, I changed the 90 degree parameter to be 40 instead. After the two for loops are done running, I set the two parameters in the map() function to be those two averages.
+
+
+
 ## Schematic
 
 ![Headstone Image](modschematic.jpg)
@@ -82,7 +93,7 @@ Figure #7: Schematic for flex sensor, accelerometer, and piezo buzzer
 For my first milestone, I figured out how to code and wire both the flex sensor and the accelerometer and make them detect when an angle is bad for my wrist. I coded both of them to tell me if I bended my wrist too far back or too far forward. 
 
 ### Flex Sensor
-The flex sensor is a resistor, and the more it bends the more resistance it will apply. I coded it so that the bend corresponds to the angle of the wrist, so the more it bends, the more the angle increases. It doesn't originally send data as angles though, it sends data as analog data (information sensors send represented by a range of values). I had to attach it to a pin that would convert the data to understandable digital data (values that actually follow Arduino's documentation). This process is basically ADC conversioon. But, since I wanted the data to be in degrees, I then had to use a few equations to convert the digital data in degrees. 
+The flex sensor is a resistor, and the more it bends the more resistance it will apply. I coded it so that the bend corresponds to the angle of the wrist, so the more it bends, the more the angle increases. It doesn't originally send data as angles though, it sends data as analog data (information sensors send represented by a range of values). I had to attach it to a pin that would convert the data to understandable digital data (values that actually follow Arduino's documentation). This process is basically ADC conversion. But, since I wanted the data to be in degrees, I then had to use a few equations to convert the digital data in degrees. 
 
 ![Headstone Image](flex sensor.png)
 
