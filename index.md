@@ -5,7 +5,7 @@ This is a device to help with wrist rehabilitation. It is a user command control
 |:--:|:--:|:--:|:--:|
 | Danica H | Monta Vista High School | Electrical Engineering | Incoming Junior
 
-![Headstone Image](DanicaH.jpg)
+![Headstone Image](DanicaH.png)
 
 # Modification
 
@@ -31,7 +31,7 @@ The first challenge that I had was when I first started working with the LED rin
 <img src="ledring.jpg" width="400"/>  
 Figure #3: The D-in and D-out pins on the led ring
 
-<img src="pcbboard.jpg" width="400"/>
+<img src="pcbboard.png" width="400"/>
 Figure #4: The pcb board with two wires connecting the power lines and ground lines
 
 
