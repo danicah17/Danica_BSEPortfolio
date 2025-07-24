@@ -147,7 +147,7 @@ Figure #16: Schematic for flex sensor and accelerometer
 
 # Code
 
-## Finalish Code
+## Final Code
 ```c++
 // Basic demo for accelerometer/gyro readings from Adafruit LSM6DS3TR-C
 const int flexPin = A6;
@@ -156,10 +156,13 @@ const int buzzer = 18;
 const int ledPins[8] = {13, 14, 15, 0, 1, 2, 3, 4};
 unsigned long currentTime = millis();
 unsigned long repStart = 0.0;
+int map1 = 0;
+int map2 = 0;
 int repCount = 0;
 int wristTurns = 1;
 int countSeconds = 0;
 int pinCounter = 0;
+bool flexCalibrate = false;
 bool waiting4Raise = false;
 bool calibrated = false;
 bool monitor = false;
@@ -200,6 +203,7 @@ void setup() {
     delay(10); // will pause Zero, Leonardo, etc until serial console opens
 
   Serial.println("Adafruit LSM6DS3TR-C test!");
+  ble.println("type menu to see list of commands available");
 
   if (!lsm6ds3trc.begin_I2C()) {
     // if (!lsm6ds3trc.begin_SPI(LSM_CS)) {
@@ -361,7 +365,7 @@ void loop() {
   // Serial.print(gyro.gyro.z);
   // Serial.println(" radians/s ");
   // Serial.println();
-  
+   
   if (ble.available()) {                                                  // if there is data to be read from the phone serial
     String message = ble.readStringUntil('\n');                           // reads the message until there is a new line
     message.toLowerCase();
@@ -372,6 +376,9 @@ void loop() {
     else if (message == "stop monitoring") {
       monitor = false;
       ble.println("stopped");
+    }
+    else if (message == "calibrate flex sensor") {
+      flexCalibrate = true;
     }
     else if (message == "do wrist turns") {
       ble.println("how many?");
@@ -385,10 +392,47 @@ void loop() {
       exercise = true;
     }
     else if (message == "menu") {
-      ble.println("1. 'start monitoring' - allows the device to monitor the angle of your wrist and beep if the angle is too steep");
-      ble.println("2. 'stop monitoring' - the device will stop monitoring the angle of your wrist, mainly used when sleeping");
-      ble.println("3. 'do wrist turns' - you will be prompted to enter the amount of wrist turns you do and it will monitor how many you do");
+      ble.println("1. 'calibrate flex sensor' - calibrates the flex sensor, DO THIS FIRSTTTTTT");
+      ble.println("2. 'start monitoring' - allows the device to monitor the angle of your wrist and beep if the angle is too steep");
+      ble.println("3. 'stop monitoring' - the device will stop monitoring the angle of your wrist, mainly used when sleeping");
+      ble.println("4. 'do wrist turns' - you will be prompted to enter the amount of wrist turns you do and it will monitor how many you do");
     }
+  }
+
+  if (flexCalibrate) {                                                    // calibrating flex sensor                                      
+    ble.println("Hold out wrist and keep it straight");
+    delay(500);
+    int total = 0;
+    for (int i = 0; i < 50; i++) {
+      int value;
+      value = analogRead(flexPin);                                        // converts the analog voltage to readable digital data
+      float voltageNumber = value * (3.3/4095.0);                         // converts the digital data to voltage
+      float resistance = fixedResistance * (3.3/voltageNumber - 1.0);
+      Serial.println("Resistance: " + String(resistance));
+      total += resistance;
+      ble.println("Getting flex sensor threshold for 0 degrees");
+      delay(100);
+    }
+    map1 = total/50;
+    total = 0;
+    ble.println("Nice! Now bend wrist at 40 degrees and hold it");
+    delay(5000);
+    for (int i = 0; i < 50; i++) {
+      int value2;
+      value2 = analogRead(flexPin);                                       // converts the analog voltage to readable digital data
+      float voltageNumber2 = value2 * (3.3/4095.0);                       // converts the digital data to voltage
+      float resistance2 = fixedResistance * (3.3/voltageNumber2 - 1.0);
+      Serial.println("Resistance part 2: " + String(resistance2));
+      ble.println("Getting flex sensor threshold for 40 degrees");
+      total += resistance2;
+      delay(100);
+    }
+    map2 = total/50;
+    total = 0;
+    flexCalibrate = false;
+    ble.println("Flex sensor calibrated");
+    ble.println("Map1: " + String(map1));
+    ble.println("Map2: " + String(map2));
   }
 
   if (monitor) {                                                          // will start monitoring the angle of the wrist if monitor is true, will not if it's false
@@ -397,11 +441,11 @@ void loop() {
     float voltage = flexValue * (3.3/4095.0);                             // converts the digital data to voltage
     float flexResistance = fixedResistance * (3.3/voltage - 1.0);         // converts voltage to resistance
     Serial.println(String(flexResistance) + " resistance");
-    float angle = map(flexResistance, 15000, 45000, 0.0, 90.0);           // converts resistance to angle it's bent at
+    float angle = map(flexResistance, map1, map2, 0.0, 40.0);             // converts resistance to angle it's bent at
     Serial.println("flexValue: "+ String(flexValue));
     Serial.print("angle: ");
     Serial.println(String(angle) + " degrees");
-    if (angle >= 30) {
+    if (angle >= 40) {
       ble.println("Tilt wrist up");
       tone(buzzer, 5000);                                                 // piezo buzzer buzzes
       for (int i = 0; i < 8; i++) {
@@ -432,8 +476,14 @@ void loop() {
     }
   }
   
+  else if (calibrated) {
+    noTone(buzzer);
+  }
+
   else {
     noTone(buzzer);
+    ring.clear();
+    ring.show();
   }
   
 
@@ -444,12 +494,12 @@ void loop() {
   if (repCount < wristTurns && exercise) {                                // will run if the use wants to do wrist turns
     if (!calibrated) {                                                    // calibrating
       if (filter.getPitch() <= 2 && filter.getPitch() >= -2) {
-        Serial.print("Filter angles: ");
-        Serial.print(filter.getRoll());
-        Serial.print(" ");
-        Serial.print(filter.getYaw());
-        Serial.print(" ");
-        Serial.println(filter.getPitch());
+        ble.print("Filter angles: ");
+        ble.print(filter.getRoll());
+        ble.print(" ");
+        ble.print(filter.getYaw());
+        ble.print(" ");
+        ble.println(filter.getPitch());
         ble.println("Calibrating.....");
         ring.setPixelColor(pinCounter, 0, 0, 255);
         ring.show();
@@ -472,12 +522,13 @@ void loop() {
         }
       }
       else {
-        Serial.print("Filter angles: ");
-        Serial.print(filter.getRoll());
-        Serial.print(" ");
-        Serial.print(filter.getYaw());
-        Serial.print(" ");
-        Serial.println(filter.getPitch());
+        ble.print("Filter angles: ");
+        ble.print(filter.getRoll());
+        ble.print(" ");
+        ble.print(filter.getYaw());
+        ble.print(" ");
+        ble.println(filter.getPitch());
+        delay(10);
         ble.println("Straighten out your wrist");
         countSeconds = 0;
       }
@@ -488,12 +539,6 @@ void loop() {
         waiting4Raise = true;                                             // boolean for waiting for the wrist to go up
         repStart = currentTime;                                           // the starting time of the rep
       }
-      Serial.print("wrist turn angles: ");
-      Serial.print(filter.getRoll());
-      Serial.print(" ");
-      Serial.print(filter.getYaw());
-      Serial.print(" ");
-      Serial.println(filter.getPitch());
 
       if (waiting4Raise && currentTime - repStart <= 2000) {              // if waiting4Raise is true and the time between the current time and the start time is less than 2 seconds
         if (filter.getPitch() <= -34) {                                   // if the wrist is pointed up and the pitch value is less than -56
