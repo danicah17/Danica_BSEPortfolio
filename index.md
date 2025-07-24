@@ -9,6 +9,8 @@ This is a device to help with wrist rehabilitation. It is a user command control
 
 # Modification
 
+<iframe width="560" height="315" src="https://www.youtube.com/embed/zzzZzzymIkc?si=bbnoX4w5Q8wLoLZ3" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
 ## Description
 For my modification, I added a 16 bit Neopixel LED ring to my device. I coded it so that it could light up for different purposes, such as the front half of it lighting up red when my wrist is tilted downwards too much. I also implemented the rainbow function that exists in the library, letting it light up rainbow once my goal of wrist turns is reached. Besides adding an LED ring, I also added a command on my phone which lets me calibrate my own values for my flex sensor to use as the parameters of the map() function.
 
