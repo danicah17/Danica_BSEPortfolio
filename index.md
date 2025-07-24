@@ -32,6 +32,7 @@ The first challenge that I had was when I first started working with the LED rin
 Figure #3: The D-in and D-out pins on the led ring
 
 <img src="pcbboard.png" width="400"/>
+
 Figure #4: The pcb board with two wires connecting the power lines and ground lines
 
 
