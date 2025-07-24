@@ -18,10 +18,19 @@ For my modification, I added a 16 bit Neopixel LED ring to my device. I coded it
 ### Adafruit 16 Bit Neopixel LED Ring
 How the ring works is that it is an output device, so I have to connect my ESP32 to the D-in pin on the ring to allow data to come through. Also, for it to work, I have to tell it what to do in my code, using functions from the Adafruit_Neopixel library. The ring has 16 bits, or 16 lights, and I can code each of them can light up as different color at the same time. It needs 5V voltage as its power, so I ended up connecting it to the V-in pin on the ESP32. The ESP32 usually trasmits 3.3V as its max, but it's because the board alters the voltage it receives from the computer and the USB-C cable. The V-in pin is an exception, so it allows whatever it is connecting to to directly tap into 5V without allowing the ESP32 to lower the voltage.
 
+
+
 ### Calibrating the Flex Sensor
 Even though I had apparently fixed the threshold of my resistance values in my third milestone, every time I sewed something onto my wrist sleeve, the values my flex sensor outputted would fluctuate a lot, and I would have to change the parameters of my map() function. Eventually, I decided that since the values were different every time I tested it, I would calibrate the values at the start of my code so I didn't have to manually fix the parameters every time. I first made a boolean called flexCalibrate which would only be set to true during the first loop of my code. This would allow me to only calibrate my flex sensor when I first start using it. Then, I created a for loop to run 50 times while I straightened my wrist, which will measure the resistance each time (using the same equations I used in milestone 1) and add it to a variable called total. After the for loop, I divided the total by 50 to find the average, which will be used as the corresponding resistance value for 0 degrees. I then set total back to 0, and repeated the code process but with me holding my wrist at a 40 degree angle and the average being the corresponding value for 40 degrees. Since usually injured users wouldn't be able to bend their wrist at 90 degrees, I changed the 90 degree parameter to be 40 instead. After the two for loops are done running, I set the two parameters in the map() function to be those two averages.
 
+![Headstone Image](newmapfunction.jpg)
+Figure #1: The new map function, map1 means the average of the 0 degree resistances, and map2 is the average of the 40 degree resistances
 
+## Challenges
+The first challenge that I had was when I first started working with the LED ring. The ring has two pins, D-in and D-out. But, because the pins on the ring look like DO and DI, I thought it meant D1 and D0 and I could connect the ESP32 to any of those pins. However, the ring is an output device, so I have to plug it in the DI pin for it to take in data and do what it's supposed to. I kept plugging it in the DO pin, so the ring wouldn't light up no matter what I wrote in my code. Once I realized it meant D-in and D-out and I connected the wires correctly, the ring started working. The second challenge was after I soldered all of my sensors and wires onto the PCB board. Both the flex sensor and the LED ring stopped working completely. The flex sensor was giving me unrealistic values and the ring was turning on. The first problem was that I had apparently gotten a bit of solder on the LED ring, so I had to solder on a new one. I thought I fixed the problem, but it also stopped working after I soldered it on. I ended up realizing that the problem was the two power lines and the two ground lines of the PCB board aren't connected by default, so my sensors weren't getting the power they needed. After I manually connected the two sides with two wires connectors (basically small jumper wires), my flex sensor and my LED ring started working properly.
+
+## Next Steps
+If I had more time, I would probably improve the precision of my accelerometer when monitoring wrist turns. Right now, I only monitor when I go down and when I go up, but not when I go left and right. I want to make it so that it monitors when I go in all 4 directions, that way I can't cheat and just move my wrist up and down. I could also try to implement speech into my project, and tell the device what to do instead of using commands on my phone.
 
 ## Schematic
 
@@ -45,6 +54,9 @@ The main challenges I had were after I soldered the flex sensor. For some reason
 ![Headstone Image](mapfunction.jpg)
 
 Figure #2: The map function that converts resistance to angle
+
+## Next Steps
+I'm going to start thinking of what modifications I can add to my device, and start soldering everything to my PCB board. I'll also sew my ESP32 onto my wrist sleeve.
 
 ## Schematic
 
@@ -79,6 +91,9 @@ Figure #6: The BLESerialnRF52 app and ESP32
 
 ## Challenges
 One of my challenges was that for some reason, when I was first testing my accelerometer for the wrist turns, the Madgwick filter was updating really slowly even though the frequency it was updating at was already really fast. I even tried upping the frequency, but that didn't change anything. Some time later, the code stopped uploading entirely and my serial port disappeared from my board menu in Arduino even though everything was plugged in. After trying to restart my computer and the Arduino app, I unplugged my device from the first charging port on my computer and plugged it into the second charging port. That charging port probably allowed more connection with the board, because once I plugged it into that port, the serial port showed up again and allowed me to upload code. My accelerometer also started updating at the correct speed when I uploaded my code. The second challenge that I had was when I tried to use the toLowerCase() method in my code. The toLowerCase() method is a void function, which means it doesn't return anything when I call it. But, since in Java though it returns a string, I assumed it was the same in C++. I basically tried to set a variable to nothing, so the code kept giving me errors. I realized that the method updates the string itself, so I needed to first call the method, and then set the variable to that updated string. The third challenge I had was with the write() function when working with the phone and computer serials. The write() function is the print() method, except it converts ASCII values to actual text when it prints. But, write() didn't work for the phone serial, only print() worked. To fix it, instead of using the read() function when reading in data, I used the readStringUntil() function, which automatically returns the string in its text form. Then I just printed that string onto the phone serial.
+
+## Next Steps
+For my next milestone, I will probably start sewing sensors and wires onto my compression sleeve. I'll also start soldering everything to my PCB board so I don't have to use my breadboard anymore.
 
 ## Schematic
 
