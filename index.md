@@ -33,7 +33,7 @@ Figure #3: The D-in and D-out pins on the led ring
 
 <img src="pcbboard.png" width="400"/>
 
-Figure #4: The pcb board with two wires connecting the power lines and ground lines
+Figure #4: The PCB board with two wires connecting the power lines and ground lines
 
 
 ## Next Steps
