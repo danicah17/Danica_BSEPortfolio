@@ -1,12 +1,9 @@
 # Wrist Rehabilitation Device
-Replace this text with a brief description (2-3 sentences) of your project. This description should draw the reader in and make them interested in what you've built. You can include what the biggest challenges, takeaways, and triumphs from completing the project were. As you complete your portfolio, remember your audience is less familiar than you are with all that your project entails!
-
+This is a device to help with wrist rehabilitation. It is a user command controlled device with sensors that can monitor the angle of the user's wrist and can also help the user exercise by tracking wrist turns. The device uses both light and sound to alert the user of improper form and to monitor the number of wrist turns, helping ensure a smoother and more effective rehab process.
 
 | **Engineer** | **School** | **Area of Interest** | **Grade** |
 |:--:|:--:|:--:|:--:|
 | Danica H | Monta Vista High School | Electrical Engineering | Incoming Junior
-
-<!--- **Replace the BlueStamp logo below with an image of yourself and your completed project. Follow the guide [here](https://tomcam.github.io/least-github-pages/adding-images-github-pages-site.html) if you need help.** -->
 
 ![Headstone Image](DanicaH.jpg)
 
@@ -25,10 +22,14 @@ Figure #1: The V-in pin on the ESP32 that I connected the LED ring to
 Even though I had apparently fixed the threshold of my resistance values in my third milestone, every time I sewed something onto my wrist sleeve, the values my flex sensor outputted would fluctuate a lot, and I would have to change the parameters of my map() function. Eventually, I decided that since the values were different every time I tested it, I would calibrate the values at the start of my code so I didn't have to manually fix the parameters every time. I first made a boolean called flexCalibrate which would only be set to true during the first loop of my code. This would allow me to only calibrate my flex sensor when I first start using it. Then, I created a for loop to run 50 times while I straightened my wrist, which will measure the resistance each time (using the same equations I used in milestone 1) and add it to a variable called total. After the for loop, I divided the total by 50 to find the average, which will be used as the corresponding resistance value for 0 degrees. I then set total back to 0, and repeated the code process but with me holding my wrist at a 40 degree angle and the average being the corresponding value for 40 degrees. Since usually injured users wouldn't be able to bend their wrist at 90 degrees, I changed the 90 degree parameter to be 40 instead. After the two for loops are done running, I set the two parameters in the map() function to be those two averages.
 
 ![Headstone Image](newmapfunction.jpg)
-Figure #1: The new map function, map1 means the average of the 0 degree resistances, and map2 is the average of the 40 degree resistances
+Figure #2: The new map function, map1 means the average of the 0 degree resistances, and map2 is the average of the 40 degree resistances
 
 ## Challenges
-The first challenge that I had was when I first started working with the LED ring. The ring has two pins, D-in and D-out. But, because the pins on the ring look like DO and DI, I thought it meant D1 and D0 and I could connect the ESP32 to any of those pins. However, the ring is an output device, so I have to plug it in the DI pin for it to take in data and do what it's supposed to. I kept plugging it in the DO pin, so the ring wouldn't light up no matter what I wrote in my code. Once I realized it meant D-in and D-out and I connected the wires correctly, the ring started working. The second challenge was after I soldered all of my sensors and wires onto the PCB board. Both the flex sensor and the LED ring stopped working completely. The flex sensor was giving me unrealistic values and the ring was turning on. The first problem was that I had apparently gotten a bit of solder on the LED ring, so I had to solder on a new one. I thought I fixed the problem, but it also stopped working after I soldered it on. I ended up realizing that the problem was the two power lines and the two ground lines of the opposite sides of the PCB board aren't connected by default, so my sensors weren't getting the power they needed. After I manually connected the two sides with two wires connectors (basically small jumper wires), my flex sensor and my LED ring started working properly.
+The first challenge that I had was when I first started working with the LED ring. The ring has two pins, D-in and D-out. But, because the pins on the ring look like DO and DI, I thought it meant D1 and D0 and I could connect the ESP32 to any of those pins. However, the ring is an output device, so I have to plug it in the DI pin for it to take in data and do what it's supposed to. I kept plugging it in the DO pin, so the ring wouldn't light up no matter what I wrote in my code. Once I realized it meant D-in and D-out and I connected the wires correctly, the ring started working. The second challenge was after I soldered all of my sensors and wires onto the PCB board. Both the flex sensor and the LED ring stopped working completely. The flex sensor was giving me unrealistic values and the ring was turning on. The first problem was that I had apparently gotten a bit of solder on the LED ring, so I had to solder on a new one. I thought I fixed the problem, but it also stopped working after I soldered it on. I ended up realizing that the problem was the two power lines and the two ground lines of the opposite sides of the PCB board aren't connected by default, so my sensors weren't getting the power they needed. As shown in the figure below, I had to manually connect the two sides with two wires connectors (basically small jumper wires). After I did that, my flex sensor and my LED ring started working properly.
+
+<img src="ledring.jpg" width="400"/>    <img src="pcbboard.jpg" width="400"/>
+Figure #3: The D-in and D-out pins on the led ring      Figure #4: The pcb board with two wires connecting the power lines and ground lines
+
 
 ## Next Steps
 If I had more time, I would probably improve the precision of my accelerometer when monitoring wrist turns. Right now, I only monitor when I go down and when I go up, but not when I go left and right. I want to make it so that it monitors when I go in all 4 directions, that way I can't cheat and just move my wrist up and down. I could also try to implement speech into my project, and tell the device what to do instead of using commands on my phone.
@@ -36,7 +37,7 @@ If I had more time, I would probably improve the precision of my accelerometer w
 ## Schematic
 
 ![Headstone Image](modschematic.jpg)
-Figure #1: Schematic for flex sensor, accelerometer, piezo buzzer, and LED ring
+Figure #5: Schematic for flex sensor, accelerometer, piezo buzzer, and LED ring
   
 # Final Milestone
 
@@ -47,14 +48,14 @@ For my third milestone, I soldered my flex sensor onto two wires so that it didn
 
 <img src="sensorsewed.jpg" width="300"/>              
 
-Figure #1: The sensor velcroed on the wrist sleeve and the accelerometer also sewed on
+Figure #6: The sensor velcroed on the wrist sleeve and the accelerometer also sewed on
 
 ## Challenges
 The main challenges I had were after I soldered the flex sensor. For some reason, when I tested it, my angle values started to jump a lot, sometimes randomly shooting to really high values and sometimes decreasing to -67 degrees. When I debugged it, I noticed the flex value was going up to 4095.0, which is the maximum digital value the flex sensor can output. That meant there was a short somewhere, which means that power is connecting to ground. After looking at my soldering, I realized one of the copper strands of the jumper wire was touching one of the metal pins on the back of the flex sensor which was causing the flex sensor to output really extreme values. After I removed the strand, the flex sensor stopped outputing extremely fluctuating values. But, the angles were still wrong. For example, when my wrist was straight, the angle outputed was about 20 degrees. I concluded that the threshold for the map() function needed to be changed, because maybe the velcro caused the sensor to bend weirdly. As shown in the figure below, the circled parameters are the threshold, with 15000 corresponding to 0 degrees and 45000 resistance corresponding to 90 degrees. After I tweaked the parameters for the map() function, everything started working normally.
 
 ![Headstone Image](mapfunction.jpg)
 
-Figure #2: The map function that converts resistance to angle
+Figure #7: The map function that converts resistance to angle
 
 ## Next Steps
 I'm going to start thinking of what modifications I can add to my device, and start soldering everything to my PCB board. I'll also sew my ESP32 onto my wrist sleeve.
@@ -62,7 +63,7 @@ I'm going to start thinking of what modifications I can add to my device, and st
 ## Schematic
 
 ![Headstone Image](milestone3schematic.jpg)
-Figure #3: Schematic of flex sensor, accelerometer, piezo buzzer
+Figure #8: Schematic of flex sensor, accelerometer, piezo buzzer
 
 # Second Milestone
 
@@ -73,7 +74,7 @@ For my second milestone, I actually changed the function of my accelerometer. Si
 
 <img src="commands.jpg" width="300"/>
 
-Figure #4: The commands I can type on my phone
+Figure #9: The commands I can type on my phone
 
 ### Piezo Buzzer
 The piezo buzzer is an output device, so I tell it what to do in my code. I can control when it beeps, the frequency at which it beeps at, and how long it beeps for. Since I want the buzzer to beep for 3 different purposes, I set a different frequency each time so the user wouldn't be confused on what it's beeping about. For example, if the flex sensor bends past 30 degrees (the threshold I set), it will keep beeping at 1000 Hz until the flex sensor's angle is below 30. On the other hand, if I'm doing wrist turns, the piezo buzzer will beep at 3000 Hz for 500 milliseconds every time I complete a wrist turn.
@@ -82,13 +83,13 @@ The piezo buzzer is an output device, so I tell it what to do in my code. I can 
 For the accelerometer, I really didn't change much. I still used the Madgwick filter to convert the values of the gyroscope and the accelerometer into orientations along the roll, pitch, and yaw axes. The only difference was how I used the values along the pitch axes. The code I had to write had a lot of checks and I had to make many global variables. For starters, I needed to make sure that the code block for wrist turns would only run when I commanded it to. I made a boolean called exercise and made it so the code block would only run if exercise was set to true. Next, I made a boolean called calibrated. To make it true, I have to make sure my wrist is straight and the pitch values were between 2 and -2 for at least 3 seconds. Once the device is calibrated, I can start doing my wrist turns. For my wrist turns, I made an another boolean called waiting4Raise. Once my wrist is pointed downwards and has a pitch value that is bigger than 42, waiting4Raise becomes true and a timer starts. waiting4Raise basically means that the device is waiting for me to move my wrist upward, since I already moved it down. If within 2 seconds my wrist is pointed up and the pitch value is less than -56, the rep count increases since that counts as a complete wrist turn. After one wrist turn, waiting4Raise is set back to false. If I have completed all of my wrist turns, exercise is set to false, calibrated is also set to false, and the rep count is set back to 0. (Refer to the second or third milestone code in the code appendix to see how I coded the wrist turns)
 
 ![Headstone Image](Programming flowchart example.jpeg)
-Figure #5: The flow chart of my wrist turn code
+Figure #10: The flow chart of my wrist turn code
 
 ### Bluetooth
 Since the ESP32 already has a built in Bluetooth module, I didn't have to use the HC05. Implementing the Bluetooth module was not too complicated. I first downloaded the BleSerial library on Arduino and created a BleSerial object in my code. The BleSerial object is the serial on my phone, and creating it allows me to actually run code that uses it. I then downloaded the BLESerialnRF52 app on my phone, since downloading an app is the only way to open a serial on a phone. I then figured out how to communicate between the two serials using code. It mainly consisted of using the available() function to check if there was data to be read, then using the read() function to read the data. Then with that data I could do whatever I wanted. I realized I could use this communication to write commands on my phone. I tweaked the code so that the device would do things based on the commands I typed on my phone serial. For example, if I typed "start monitoring" on my phone, the device would start monitoring the angle of the flex sensor and allowing the buzzer to beep. Or, if I wanted to do a certain amount of wrist turns, I could type in "do wrist turns" on my serial and also type in how many I want to do. (Refer to the milestone 2 or milestone 2 code in the code appendix to see how I coded the bluetooth serial)
 
 ![Headstone Image](bleandesp.jpg)
-Figure #6: The BLESerialnRF52 app and ESP32
+Figure #11: The BLESerialnRF52 app and ESP32
 
 ## Challenges
 One of my challenges was that for some reason, when I was first testing my accelerometer for the wrist turns, the Madgwick filter was updating really slowly even though the frequency it was updating at was already really fast. I even tried upping the frequency, but that didn't change anything. Some time later, the code stopped uploading entirely and my serial port disappeared from my board menu in Arduino even though everything was plugged in. After trying to restart my computer and the Arduino app, I unplugged my device from the first charging port on my computer and plugged it into the second charging port. That charging port probably allowed more connection with the board, because once I plugged it into that port, the serial port showed up again and allowed me to upload code. My accelerometer also started updating at the correct speed when I uploaded my code. The second challenge that I had was when I tried to use the toLowerCase() method in my code. The toLowerCase() method is a void function, which means it doesn't return anything when I call it. But, since in Java though it returns a string, I assumed it was the same in C++. I basically tried to set a variable to nothing, so the code kept giving me errors. I realized that the method updates the string itself, so I needed to first call the method, and then set the variable to that updated string. The third challenge I had was with the write() function when working with the phone and computer serials. The write() function is the print() method, except it converts ASCII values to actual text when it prints. But, write() didn't work for the phone serial, only print() worked. To fix it, instead of using the read() function when reading in data, I used the readStringUntil() function, which automatically returns the string in its text form. Then I just printed that string onto the phone serial.
@@ -99,7 +100,7 @@ For my next milestone, I will probably start sewing sensors and wires onto my co
 ## Schematic
 
 ![Headstone Image](milestone2schematic.jpg)
-Figure #7: Schematic for flex sensor, accelerometer, and piezo buzzer
+Figure #12: Schematic for flex sensor, accelerometer, and piezo buzzer
 
 # First Milestone
 
@@ -113,20 +114,20 @@ The flex sensor is a resistor, and the more it bends the more resistance it will
 
 ![Headstone Image](flex sensor.png)
 
-Figure #8: Flex sensor
+Figure #13: Flex sensor
 
 ### Converting Digital Data to Angles
 The first equation I used was (flexValue * (3.3/4095.0)). FlexValue is the digital data that the Arduino outputs, 3.3 is the max analog value (aka voltage) the ESP32 is able to output, and 4095.0 is the corresponding max digital value. This equation helps convert the digital data to voltage. The next equation I used was (10000 * (3.3/voltage - 1.0)). The 10000 is the resistance of the flex sensor when it is straight, the 3.3 is again the max value of voltage the ESP32 can output, and the voltage is the voltage found from the previous equation. The equation is used to convert the voltage to the amount of resistance the flex sensor is applying. After I used those 2 equations to find the resistance, I used a function called map() that actually helps convert those resistance values into angles. The map() function takes in a few parameters so know what resistance value counts as 0 degrees and what counts as 90 degrees. I set the optimal wrist degree to 30 degrees, which means if the flex sensor ever bends past 30 degrees the computer will print out a message warning me to fix my wrist posture. 
 
 ![Headstone Image](equations.jpg)
-Figure #9: Equations that I used
+Figure #14: Equations that I used
 
 ### Accelerometer and Madgwick Filter
 For the accelerometer, since it measures both values of a gyroscope (rotation speed) and an accelerometer (acceleration) along the x, y, and z axes, it outputs 6 values at a time. I ended up using a Madgwick filter to help convert all of those values into the orientationos of the object along the roll, yaw, and pitch axes. The roll, pitch, and yaw axes are the main axes that planes use in the air. I again set a threshold for the pitch axis, since the pitch axis is what the wrist technically rotates around. That threshold will also indicate if I need to fix my posture.
 
 ![Headstone Image](rollpitchyaw.jpg)
 
-Figure #10: Roll, pitch, and yaw axes
+Figure #15: Roll, pitch, and yaw axes
 
 ## Challenges
 One of the challenges was I had was adjusting the conversion equations. The ones I found online were for the Arduino Uno board, and since I'm using the ESP32 board, the equations were giving me the wrong values. The voltage was 5 instead of 3.3, and the corresponding digital was 1023.0 instead of 4095.0. I had to adjust those values according to the ranges of the ESP32. But after I adjusted the values, another problem happened. As I bent the flex sensor, the output values would get smaller instead of larger. After analyzing the equations, I concluded I needed to switch the positions of my resistor and my flex sensor on my breadboard, as the way I had originally placed them caused them to send incorrect values to the equation. Another challenge was that the accelerometer also had a gyroscope, so it was giving me 6 values at a time and I didn't know which of the 6 to use. I realized that Arduino has a library called Madgwick that actually filters those 6 values and gives you the position of the accelerometer along the roll, yaw, and pitch axes. I ended up using that filter and using the values it gave me to set a threshold.
@@ -137,7 +138,7 @@ For my next steps, I will first add a piezo buzzer to my ESP32 so that it will b
 ## Schematic
 
 ![Headstone Image](milestone1schematic.jpg)
-Figure #11: Schematic for flex sensor and accelerometer
+Figure #16: Schematic for flex sensor and accelerometer
 
 # Code
 
